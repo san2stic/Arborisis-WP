@@ -26,17 +26,45 @@ class ArbMap {
     }
 
     init() {
-        this.createMap();
-        this.addEventListeners();
-        this.loadSounds();
+        try {
+            if (!document.getElementById('map')) {
+                console.error('Map container not found');
+                return;
+            }
 
-        // Hide loading overlay
-        setTimeout(() => {
-            document.getElementById('map-loading')?.classList.add('hidden');
-        }, 500);
+            this.createMap();
+            this.addEventListeners();
+            this.loadSounds();
+
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            // Show error in map container
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div class="flex items-center justify-center w-full h-full text-red-500">
+                        <div class="text-center">
+                            <p class="font-bold">Erreur de chargement de la carte</p>
+                            <p class="text-sm">${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        } finally {
+            // Hide loading overlay independently of success/failure
+            setTimeout(() => {
+                document.getElementById('map-loading')?.classList.add('hidden');
+            }, 500);
+        }
     }
 
     createMap() {
+        // Check if map container has size
+        const mapEl = document.getElementById('map');
+        if (!mapEl.clientHeight) {
+            mapEl.style.minHeight = '600px';
+        }
+
         // Initialize map
         this.map = L.map('map', {
             center: this.config.defaultCenter,
@@ -56,6 +84,11 @@ class ArbMap {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19,
         }).addTo(this.map);
+
+        // Fix map size invalidation
+        setTimeout(() => {
+            this.map.invalidateSize();
+        }, 100);
     }
 
     addEventListeners() {

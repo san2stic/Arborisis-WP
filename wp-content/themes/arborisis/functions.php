@@ -151,6 +151,17 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+
+        if (isset($map['css'])) {
+            foreach ($map['css'] as $css) {
+                wp_enqueue_style(
+                    'arborisis-map-css',
+                    ARBORISIS_THEME_URI . '/dist/' . $css,
+                    ['arborisis-main-css'],
+                    ARBORISIS_THEME_VERSION
+                );
+            }
+        }
     }
 
     // Graph page
@@ -163,6 +174,17 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+
+        if (isset($graph['css'])) {
+            foreach ($graph['css'] as $css) {
+                wp_enqueue_style(
+                    'arborisis-graph-css',
+                    ARBORISIS_THEME_URI . '/dist/' . $css,
+                    ['arborisis-main-css'],
+                    ARBORISIS_THEME_VERSION
+                );
+            }
+        }
     }
 
     // Single sound
@@ -175,6 +197,17 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+
+        if (isset($player['css'])) {
+            foreach ($player['css'] as $css) {
+                wp_enqueue_style(
+                    'arborisis-player-css',
+                    ARBORISIS_THEME_URI . '/dist/' . $css,
+                    ['arborisis-main-css'],
+                    ARBORISIS_THEME_VERSION
+                );
+            }
+        }
     }
 }
 
