@@ -23,4 +23,20 @@ fi
 echo "🔓 Setting public read policy..."
 mc anonymous set download myminio/${S3_BUCKET}
 
+# Configure CORS for browser uploads
+echo "🌐 Configuring CORS..."
+cat > /tmp/cors.json << 'EOF'
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": ["*"],
+      "AllowedMethods": ["GET", "HEAD", "PUT", "POST"],
+      "AllowedHeaders": ["*"],
+      "ExposeHeaders": ["ETag"]
+    }
+  ]
+}
+EOF
+mc cors set /tmp/cors.json myminio/${S3_BUCKET}
+
 echo "✅ MinIO initialization complete"
