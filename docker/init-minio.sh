@@ -25,18 +25,20 @@ mc anonymous set download myminio/${S3_BUCKET}
 
 # Configure CORS for browser uploads
 echo "🌐 Configuring CORS..."
-cat > /tmp/cors.json << 'EOF'
-{
-  "CORSRules": [
-    {
-      "AllowedOrigins": ["*"],
-      "AllowedMethods": ["GET", "HEAD", "PUT", "POST"],
-      "AllowedHeaders": ["*"],
-      "ExposeHeaders": ["ETag"]
-    }
-  ]
-}
+cat > /tmp/cors.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration>
+  <CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+    <AllowedHeader>*</AllowedHeader>
+    <ExposeHeader>ETag</ExposeHeader>
+  </CORSRule>
+</CORSConfiguration>
 EOF
-mc cors set myminio/${S3_BUCKET} /tmp/cors.json
+mc cors set myminio/${S3_BUCKET} /tmp/cors.xml
 
 echo "✅ MinIO initialization complete"
