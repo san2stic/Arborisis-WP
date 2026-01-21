@@ -71,5 +71,8 @@ EOF
     echo "wp-config.php created successfully"
 fi
 
+# Run initialization in background (waits for MySQL then configures WP)
+nohup /usr/local/bin/init-wordpress > /var/log/nginx/init-wordpress.log 2>&1 &
+
 # Execute the original command
 exec "$@"

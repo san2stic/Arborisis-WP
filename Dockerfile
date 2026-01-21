@@ -126,7 +126,9 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 
 # Add entrypoint script for wp-config.php generation
 COPY docker/docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# Add initialization script
+COPY docker/init-wordpress.sh /usr/local/bin/init-wordpress
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh /usr/local/bin/init-wordpress
 
 # Security: Run as non-root where possible
 RUN chown -R www-data:www-data /var/lib/nginx /var/log/nginx
