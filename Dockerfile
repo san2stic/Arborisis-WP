@@ -1,9 +1,15 @@
 # Multi-stage build for optimized production image
 FROM composer:2 AS composer-build
 
+# Install root composer dependencies
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# Install plugin composer dependencies
+WORKDIR /app/plugins
+COPY wp-content/plugins/arborisis-search/composer.json wp-content/plugins/arborisis-search/composer.lock* ./arborisis-search/
+RUN cd arborisis-search && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
 
 # Main image
 FROM php:8.2-fpm-alpine AS base
@@ -89,6 +95,10 @@ COPY --chown=www-data:www-data ./wp-content /var/www/html/wp-content
 
 # Copy composer dependencies from build stage
 COPY --from=composer-build --chown=www-data:www-data /app/vendor ./vendor
+COPY --from=composer-build --chown=www-data:www-data /app/plugins/arborisis-search/vendor ./wp-content/plugins/arborisis-search/vendor
+
+# Copy composer binary for potential runtime use
+COPY --from=composer-build /usr/bin/composer /usr/local/bin/composer
 
 # Create required directories with correct permissions
 RUN mkdir -p \
