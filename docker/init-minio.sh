@@ -7,8 +7,8 @@ set -e
 echo "🗄️  Waiting for MinIO to be ready..."
 sleep 5
 
-# Configure MinIO client
-mc alias set myminio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY}
+# Configure MinIO client (use quotes for passwords with special characters)
+mc alias set myminio http://minio:9000 "${S3_ACCESS_KEY}" "${S3_SECRET_KEY}"
 
 # Create bucket if it doesn't exist
 if ! mc ls myminio/${S3_BUCKET} > /dev/null 2>&1; then
