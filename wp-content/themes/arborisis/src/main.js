@@ -163,7 +163,14 @@ class GlobalSearch {
 
     async performSearch(query) {
         try {
-            const results = await window.ArbAPI.search(query, { per_page: 8 });
+            const response = await window.ArbAPI.search(query, { per_page: 8 });
+            // API returns { sounds: [...], total, meta }
+            const results = response.sounds || response;
+            if (!Array.isArray(results)) {
+                console.error('Invalid search response:', response);
+                this.showResults([]);
+                return;
+            }
             this.showResults(results);
         } catch (error) {
             console.error('Search failed:', error);
@@ -193,7 +200,7 @@ class GlobalSearch {
         return `
             <a href="/sound/${sound.id}" class="block p-4 hover:bg-dark-50 dark:hover:bg-dark-700 transition-colors border-b border-dark-200 dark:border-dark-700 last:border-0">
                 <div class="flex gap-3">
-                    <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.jpg'}"
+                    <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.svg'}"
                          alt="${sound.title}"
                          class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
                     <div class="flex-1 min-w-0">
@@ -221,21 +228,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Utility functions
-window.formatDuration = function(seconds) {
+window.formatDuration = function (seconds) {
     if (!seconds) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-window.formatNumber = function(num) {
+window.formatNumber = function (num) {
     if (!num) return '0';
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
     if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return num.toString();
 };
 
-window.formatDate = function(date) {
+window.formatDate = function (date) {
     const d = new Date(date);
     const now = new Date();
     const diff = now - d;
