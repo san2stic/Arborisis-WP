@@ -1,0 +1,61 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files (will be provided at runtime)
+.env
+.env.local
+.env.*.local
+
+# Documentation
+*.md
+!README.md
+COMMANDS.md
+DEPLOY-JELASTIC.md
+DOCKER.md
+FILES-CREATED.md
+INSTALLATION.md
+PROJECT-COMPLETE.md
+STRUCTURE.md
+SUCCESS.md
+THEME-COMPLETE.md
+
+# IDE
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary
+/tmp
+/temp
+
+# Archives
+*.zip
+Archive.zip
+
+# Node (if any)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build artifacts not needed in image
+/wp-content/themes/*/dist/
+/wp-content/themes/*/node_modules/
+
+# Cache
+/wp-content/cache/
+
+# Uploads (should be mounted as volume)
+/wp-content/uploads/
