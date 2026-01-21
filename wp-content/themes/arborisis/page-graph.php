@@ -346,7 +346,13 @@ get_header();
             searchTimeout = setTimeout(async () => {
                 try {
                     const response = await fetch(`/wp-json/arborisis/v1/sounds?search=${encodeURIComponent(query)}&per_page=5`);
-                    const sounds = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const sounds = data.sounds || []; // Access nested sounds array
 
                     if (sounds.length > 0) {
                         searchResults.innerHTML = sounds.map(sound => `

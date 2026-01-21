@@ -254,7 +254,14 @@ class ArbGraph {
     async randomStart() {
         try {
             const response = await fetch('/wp-json/arborisis/v1/sounds?orderby=random&per_page=1');
-            const sounds = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const sounds = data.sounds || []; // Access nested sounds array
+
             if (sounds.length > 0) {
                 this.explore(sounds[0].id);
             }
@@ -266,7 +273,14 @@ class ArbGraph {
     async trendingStart() {
         try {
             const response = await fetch('/wp-json/arborisis/v1/sounds?orderby=trending&per_page=1');
-            const sounds = await response.json();
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const sounds = data.sounds || []; // Access nested sounds array
+
             if (sounds.length > 0) {
                 this.explore(sounds[0].id);
             }
