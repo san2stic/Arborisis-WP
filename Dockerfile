@@ -14,8 +14,8 @@ RUN cd arborisis-search && composer install --no-dev --optimize-autoloader --no-
 # Node.js build stage for theme
 FROM node:18-alpine AS node-build
 WORKDIR /app
-COPY wp-content/themes/arborisis/package.json wp-content/themes/arborisis/package-lock.json ./
-RUN npm ci
+COPY wp-content/themes/arborisis/package.json ./
+RUN npm install
 COPY wp-content/themes/arborisis ./
 RUN npm run build
 
