@@ -26,7 +26,6 @@ mc anonymous set download myminio/${S3_BUCKET}
 # Configure CORS for browser uploads
 echo "🌐 Configuring CORS..."
 cat > /tmp/cors.xml << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
 <CORSConfiguration>
   <CORSRule>
     <AllowedOrigin>*</AllowedOrigin>
@@ -35,7 +34,6 @@ cat > /tmp/cors.xml << 'EOF'
     <AllowedMethod>PUT</AllowedMethod>
     <AllowedMethod>POST</AllowedMethod>
     <AllowedHeader>*</AllowedHeader>
-    <ExposeHeader>ETag</ExposeHeader>
   </CORSRule>
 </CORSConfiguration>
 EOF
