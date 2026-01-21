@@ -5,7 +5,8 @@
  * @package Arborisis
  */
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+    exit;
 
 define('ARBORISIS_THEME_VERSION', '1.0.0');
 define('ARBORISIS_THEME_DIR', get_template_directory());
@@ -15,7 +16,8 @@ define('ARBORISIS_THEME_URI', get_template_directory_uri());
  * Theme setup
  */
 add_action('after_setup_theme', 'arborisis_setup');
-function arborisis_setup() {
+function arborisis_setup()
+{
     // Add theme support
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
@@ -32,7 +34,7 @@ function arborisis_setup() {
     // Register navigation menus
     register_nav_menus([
         'primary' => __('Primary Menu', 'arborisis'),
-        'footer'  => __('Footer Menu', 'arborisis'),
+        'footer' => __('Footer Menu', 'arborisis'),
     ]);
 }
 
@@ -40,7 +42,8 @@ function arborisis_setup() {
  * Enqueue Vite assets
  */
 add_action('wp_enqueue_scripts', 'arborisis_enqueue_assets');
-function arborisis_enqueue_assets() {
+function arborisis_enqueue_assets()
+{
     $is_dev = defined('WP_ENV') && WP_ENV === 'development';
 
     if ($is_dev) {
@@ -53,7 +56,12 @@ function arborisis_enqueue_assets() {
         wp_script_add_data('arborisis-main', 'type', 'module');
     } else {
         // Production mode: compiled assets
-        $manifest_path = ARBORISIS_THEME_DIR . '/dist/manifest.json';
+        $manifest_path = ARBORISIS_THEME_DIR . '/dist/.vite/manifest.json';
+
+        if (!file_exists($manifest_path)) {
+            // Fallback for older Vite versions
+            $manifest_path = ARBORISIS_THEME_DIR . '/dist/manifest.json';
+        }
 
         if (file_exists($manifest_path)) {
             $manifest = json_decode(file_get_contents($manifest_path), true);
@@ -86,21 +94,21 @@ function arborisis_enqueue_assets() {
 
     // Localize script with API data
     wp_localize_script('arborisis-main', 'arborisData', [
-        'apiUrl'    => rest_url('arborisis/v1'),
-        'nonce'     => wp_create_nonce('wp_rest'),
-        'userId'    => get_current_user_id(),
-        'isLoggedIn'=> is_user_logged_in(),
-        'homeUrl'   => home_url('/'),
-        'themeUrl'  => ARBORISIS_THEME_URI,
-        'strings'   => [
-            'loading'    => __('Loading...', 'arborisis'),
-            'error'      => __('An error occurred', 'arborisis'),
-            'play'       => __('Play', 'arborisis'),
-            'pause'      => __('Pause', 'arborisis'),
-            'like'       => __('Like', 'arborisis'),
-            'share'      => __('Share', 'arborisis'),
-            'download'   => __('Download', 'arborisis'),
-            'explore'    => __('Explore', 'arborisis'),
+        'apiUrl' => rest_url('arborisis/v1'),
+        'nonce' => wp_create_nonce('wp_rest'),
+        'userId' => get_current_user_id(),
+        'isLoggedIn' => is_user_logged_in(),
+        'homeUrl' => home_url('/'),
+        'themeUrl' => ARBORISIS_THEME_URI,
+        'strings' => [
+            'loading' => __('Loading...', 'arborisis'),
+            'error' => __('An error occurred', 'arborisis'),
+            'play' => __('Play', 'arborisis'),
+            'pause' => __('Pause', 'arborisis'),
+            'like' => __('Like', 'arborisis'),
+            'share' => __('Share', 'arborisis'),
+            'download' => __('Download', 'arborisis'),
+            'explore' => __('Explore', 'arborisis'),
         ],
     ]);
 
@@ -117,11 +125,19 @@ function arborisis_enqueue_assets() {
  * Enqueue page-specific scripts
  */
 add_action('wp_enqueue_scripts', 'arborisis_enqueue_page_scripts');
-function arborisis_enqueue_page_scripts() {
-    if (!is_production()) return;
+function arborisis_enqueue_page_scripts()
+{
+    if (!is_production())
+        return;
 
-    $manifest_path = ARBORISIS_THEME_DIR . '/dist/manifest.json';
-    if (!file_exists($manifest_path)) return;
+    $manifest_path = ARBORISIS_THEME_DIR . '/dist/.vite/manifest.json';
+
+    if (!file_exists($manifest_path)) {
+        $manifest_path = ARBORISIS_THEME_DIR . '/dist/manifest.json';
+    }
+
+    if (!file_exists($manifest_path))
+        return;
 
     $manifest = json_decode(file_get_contents($manifest_path), true);
 
@@ -165,7 +181,8 @@ function arborisis_enqueue_page_scripts() {
 /**
  * Check if production mode
  */
-function is_production() {
+function is_production()
+{
     return !defined('WP_ENV') || WP_ENV === 'production';
 }
 
@@ -173,7 +190,8 @@ function is_production() {
  * Body classes
  */
 add_filter('body_class', 'arborisis_body_classes');
-function arborisis_body_classes($classes) {
+function arborisis_body_classes($classes)
+{
     // Add dark mode class if user preference
     if (isset($_COOKIE['dark-mode']) && $_COOKIE['dark-mode'] === 'true') {
         $classes[] = 'dark';
@@ -199,7 +217,8 @@ function arborisis_body_classes($classes) {
  * Custom excerpt length
  */
 add_filter('excerpt_length', 'arborisis_excerpt_length');
-function arborisis_excerpt_length($length) {
+function arborisis_excerpt_length($length)
+{
     return 30;
 }
 
@@ -207,7 +226,8 @@ function arborisis_excerpt_length($length) {
  * Custom excerpt more
  */
 add_filter('excerpt_more', 'arborisis_excerpt_more');
-function arborisis_excerpt_more($more) {
+function arborisis_excerpt_more($more)
+{
     return '...';
 }
 
@@ -215,7 +235,8 @@ function arborisis_excerpt_more($more) {
  * Add async/defer attributes to scripts
  */
 add_filter('script_loader_tag', 'arborisis_script_loader_tag', 10, 3);
-function arborisis_script_loader_tag($tag, $handle, $src) {
+function arborisis_script_loader_tag($tag, $handle, $src)
+{
     // Add defer to main scripts
     if (strpos($handle, 'arborisis-') === 0) {
         $tag = str_replace(' src', ' defer src', $tag);
