@@ -178,6 +178,10 @@
     @apply relative w-full h-screen bg-dark-100 dark:bg-dark-900;
   }
 
+  #map {
+    @apply z-0;
+  }
+
   .map-marker {
     @apply w-8 h-8 bg-primary-500 rounded-full shadow-glow;
     @apply flex items-center justify-center text-white text-xs font-bold;

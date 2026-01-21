@@ -200,10 +200,13 @@ async function loadSounds(page = 1, append = false) {
 
         const queryString = new URLSearchParams(params).toString();
         const response = await fetch(`/wp-json/arborisis/v1/sounds?${queryString}`);
-        const sounds = await response.json();
+        const data = await response.json();
+
+        // Handle both array and object responses
+        const sounds = Array.isArray(data) ? data : (data.sounds || []);
 
         // Get total from headers
-        const total = parseInt(response.headers.get('X-WP-Total') || 0);
+        const total = parseInt(response.headers.get('X-WP-Total') || sounds.length);
         totalPages = Math.ceil(total / 12);
 
         // Update count

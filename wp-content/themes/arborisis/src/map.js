@@ -123,8 +123,14 @@ class ArbMap {
             this.renderMarkers(data);
 
             // Update visible count
-            const totalSounds = data.sounds?.length || 0 + (data.clusters?.reduce((sum, c) => sum + c.count, 0) || 0);
-            document.getElementById('visible-count').textContent = totalSounds;
+            const soundsCount = (Array.isArray(data.sounds) ? data.sounds.length : 0);
+            const clustersCount = (Array.isArray(data.clusters) ? data.clusters.reduce((sum, c) => sum + (c.count || 0), 0) : 0);
+            const totalSounds = soundsCount + clustersCount;
+
+            const countElement = document.getElementById('visible-count');
+            if (countElement) {
+                countElement.textContent = totalSounds;
+            }
 
         } catch (error) {
             console.error('Failed to load sounds:', error);
@@ -138,18 +144,22 @@ class ArbMap {
 
     renderMarkers(data) {
         // Render individual sounds
-        if (data.sounds) {
+        if (data.sounds && Array.isArray(data.sounds)) {
             data.sounds.forEach(sound => {
-                const marker = this.createSoundMarker(sound);
-                this.markers.push(marker);
+                if (sound && sound.latitude && sound.longitude) {
+                    const marker = this.createSoundMarker(sound);
+                    this.markers.push(marker);
+                }
             });
         }
 
         // Render clusters
-        if (data.clusters) {
+        if (data.clusters && Array.isArray(data.clusters)) {
             data.clusters.forEach(cluster => {
-                const marker = this.createClusterMarker(cluster);
-                this.markers.push(marker);
+                if (cluster && cluster.centroid && cluster.centroid.lat && cluster.centroid.lon) {
+                    const marker = this.createClusterMarker(cluster);
+                    this.markers.push(marker);
+                }
             });
         }
     }
