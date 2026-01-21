@@ -3,14 +3,17 @@
  * Stats Aggregator
  */
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+    exit;
 
-class ARB_Aggregator {
+class ARB_Aggregator
+{
 
     /**
      * Aggregate plays for a specific day
      */
-    public static function aggregate_plays_for_day($date = null) {
+    public static function aggregate_plays_for_day($date = null)
+    {
         global $wpdb;
         $plays_table = $wpdb->prefix . 'arb_plays';
         $daily_table = $wpdb->prefix . 'arb_plays_daily';
@@ -30,8 +33,8 @@ class ARB_Aggregator {
 
         foreach ($results as $row) {
             $wpdb->replace($daily_table, [
-                'sound_id'    => $row->sound_id,
-                'day'         => $date,
+                'sound_id' => $row->sound_id,
+                'day' => $date,
                 'plays_count' => $row->plays_count,
             ]);
         }
@@ -42,7 +45,8 @@ class ARB_Aggregator {
     /**
      * Aggregate all plays
      */
-    public static function aggregate_all_plays() {
+    public static function aggregate_all_plays()
+    {
         global $wpdb;
         $plays_table = $wpdb->prefix . 'arb_plays';
         $daily_table = $wpdb->prefix . 'arb_plays_daily';
@@ -75,14 +79,15 @@ class ARB_Aggregator {
     /**
      * Compute trending scores
      */
-    public static function compute_trending_scores() {
+    public static function compute_trending_scores()
+    {
         global $wpdb;
 
         $sounds = get_posts([
-            'post_type'      => 'sound',
-            'post_status'    => 'publish',
+            'post_type' => 'sound',
+            'post_status' => 'publish',
             'posts_per_page' => -1,
-            'fields'         => 'ids',
+            'fields' => 'ids',
         ]);
 
         $updated = 0;
@@ -98,12 +103,14 @@ class ARB_Aggregator {
     /**
      * Calculate trending score for a sound
      */
-    private static function calculate_trending_score($sound_id) {
+    private static function calculate_trending_score($sound_id)
+    {
         $plays_7d = self::get_plays_last_n_days($sound_id, 7);
         $likes = ARB_Likes_Manager::get_count($sound_id);
         $post = get_post($sound_id);
 
-        if (!$post) return 1.0;
+        if (!$post)
+            return 1.0;
 
         // Age in days
         $age_days = (time() - strtotime($post->post_date)) / 86400;
@@ -117,7 +124,8 @@ class ARB_Aggregator {
     /**
      * Get plays for last N days
      */
-    private static function get_plays_last_n_days($sound_id, $days) {
+    private static function get_plays_last_n_days($sound_id, $days)
+    {
         global $wpdb;
         $table = $wpdb->prefix . 'arb_plays_daily';
 
@@ -136,13 +144,14 @@ class ARB_Aggregator {
     /**
      * Get top sounds
      */
-    public static function top_sounds($limit = 10, $period = 'all') {
+    public static function top_sounds($limit = 10, $period = 'all')
+    {
         $args = [
-            'post_type'      => 'sound',
-            'post_status'    => 'publish',
+            'post_type' => 'sound',
+            'post_status' => 'publish',
             'posts_per_page' => $limit,
-            'orderby'        => 'meta_value_num',
-            'order'          => 'DESC',
+            'orderby' => 'meta_value_num',
+            'order' => 'DESC',
         ];
 
         if ($period === '7d' || $period === '30d') {
@@ -155,12 +164,19 @@ class ARB_Aggregator {
 
         $sounds = get_posts($args);
 
-        return array_map(function($post) {
+        return array_map(function ($post) {
+            $plays_count = ARB_Plays_Tracker::get_count($post->ID);
+            $likes_count = ARB_Likes_Manager::get_count($post->ID);
+            $thumbnail = get_post_meta($post->ID, '_thumbnail_url', true);
+
             return [
-                'id'    => $post->ID,
+                'id' => $post->ID,
                 'title' => $post->post_title,
-                'plays' => ARB_Plays_Tracker::get_count($post->ID),
-                'likes' => ARB_Likes_Manager::get_count($post->ID),
+                'thumbnail' => $thumbnail ?: null,
+                'plays_count' => $plays_count,
+                'likes_count' => $likes_count,
+                'plays' => $plays_count, // Backwards compatibility
+                'likes' => $likes_count, // Backwards compatibility
             ];
         }, $sounds);
     }
@@ -168,11 +184,12 @@ class ARB_Aggregator {
     /**
      * Get top users
      */
-    public static function top_users($limit = 10) {
+    public static function top_users($limit = 10)
+    {
         global $wpdb;
 
         $results = $wpdb->get_results($wpdb->prepare(
-            "SELECT post_author, SUM(meta_value) as total_plays
+            "SELECT post_author, COUNT(*) as sounds_count, SUM(meta_value) as total_plays
              FROM {$wpdb->posts} p
              INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
              WHERE p.post_type = 'sound'
@@ -184,12 +201,15 @@ class ARB_Aggregator {
             $limit
         ));
 
-        return array_map(function($row) {
+        return array_map(function ($row) {
             $user = get_userdata($row->post_author);
             return [
-                'id'    => $row->post_author,
-                'name'  => $user ? $user->display_name : 'Unknown',
-                'plays' => (int) $row->total_plays,
+                'id' => $row->post_author,
+                'name' => $user ? $user->display_name : 'Unknown',
+                'username' => $user ? $user->user_login : 'unknown',
+                'sounds_count' => (int) $row->sounds_count,
+                'total_plays' => (int) $row->total_plays,
+                'plays' => (int) $row->total_plays, // Backwards compatibility
             ];
         }, $results);
     }
@@ -197,7 +217,8 @@ class ARB_Aggregator {
     /**
      * Get plays timeline
      */
-    public static function plays_timeline($days = 30) {
+    public static function plays_timeline($days = 30)
+    {
         global $wpdb;
         $table = $wpdb->prefix . 'arb_plays_daily';
 
@@ -210,9 +231,9 @@ class ARB_Aggregator {
             $days
         ));
 
-        return array_map(function($row) {
+        return array_map(function ($row) {
             return [
-                'date'  => $row->day,
+                'date' => $row->day,
                 'plays' => (int) $row->plays,
             ];
         }, $results);

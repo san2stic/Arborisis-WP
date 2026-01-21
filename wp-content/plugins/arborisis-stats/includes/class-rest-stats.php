@@ -3,62 +3,65 @@
  * REST API Endpoints for Stats
  */
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+    exit;
 
-class ARB_REST_Stats {
+class ARB_REST_Stats
+{
 
     /**
      * Register REST routes
      */
-    public static function register_routes() {
+    public static function register_routes()
+    {
         // Track play
         register_rest_route('arborisis/v1', '/sounds/(?P<id>\d+)/play', [
-            'methods'             => 'POST',
-            'callback'            => [__CLASS__, 'track_play'],
+            'methods' => 'POST',
+            'callback' => [__CLASS__, 'track_play'],
             'permission_callback' => '__return_true',
         ]);
 
         // Toggle like
         register_rest_route('arborisis/v1', '/sounds/(?P<id>\d+)/like', [
-            'methods'             => 'POST',
-            'callback'            => [__CLASS__, 'toggle_like'],
+            'methods' => 'POST',
+            'callback' => [__CLASS__, 'toggle_like'],
             'permission_callback' => 'is_user_logged_in',
         ]);
 
         // Sound stats
         register_rest_route('arborisis/v1', '/sounds/(?P<id>\d+)/stats', [
-            'methods'             => 'GET',
-            'callback'            => [__CLASS__, 'sound_stats'],
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'sound_stats'],
             'permission_callback' => '__return_true',
         ]);
 
         // Global stats
         register_rest_route('arborisis/v1', '/stats/global', [
-            'methods'             => 'GET',
-            'callback'            => [__CLASS__, 'global_stats'],
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'global_stats'],
             'permission_callback' => '__return_true',
         ]);
 
         // User stats
         register_rest_route('arborisis/v1', '/stats/user/(?P<id>\d+)', [
-            'methods'             => 'GET',
-            'callback'            => [__CLASS__, 'user_stats'],
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'user_stats'],
             'permission_callback' => '__return_true',
         ]);
 
         // Leaderboards
         register_rest_route('arborisis/v1', '/stats/leaderboards', [
-            'methods'             => 'GET',
-            'callback'            => [__CLASS__, 'leaderboards'],
+            'methods' => 'GET',
+            'callback' => [__CLASS__, 'leaderboards'],
             'permission_callback' => '__return_true',
-            'args'                => [
+            'args' => [
                 'type' => [
                     'default' => 'sounds',
-                    'enum'    => ['sounds', 'users'],
+                    'enum' => ['sounds', 'users'],
                 ],
                 'period' => [
                     'default' => 'all',
-                    'enum'    => ['7d', '30d', 'all'],
+                    'enum' => ['7d', '30d', 'all'],
                 ],
             ],
         ]);
@@ -67,7 +70,8 @@ class ARB_REST_Stats {
     /**
      * Track play
      */
-    public static function track_play($request) {
+    public static function track_play($request)
+    {
         $sound_id = (int) $request['id'];
         return ARB_Plays_Tracker::track($sound_id);
     }
@@ -75,7 +79,8 @@ class ARB_REST_Stats {
     /**
      * Toggle like
      */
-    public static function toggle_like($request) {
+    public static function toggle_like($request)
+    {
         $sound_id = (int) $request['id'];
         return ARB_Likes_Manager::toggle($sound_id);
     }
@@ -83,28 +88,30 @@ class ARB_REST_Stats {
     /**
      * Sound stats
      */
-    public static function sound_stats($request) {
+    public static function sound_stats($request)
+    {
         $sound_id = (int) $request['id'];
 
         $plays_7d = ARB_Aggregator::get_plays_last_n_days($sound_id, 7);
         $plays_30d = ARB_Aggregator::get_plays_last_n_days($sound_id, 30);
 
         return new WP_REST_Response([
-            'plays_total'   => ARB_Plays_Tracker::get_count($sound_id),
+            'plays_total' => ARB_Plays_Tracker::get_count($sound_id),
             'plays_last_7d' => $plays_7d,
-            'plays_last_30d'=> $plays_30d,
-            'likes_total'   => ARB_Likes_Manager::get_count($sound_id),
-            'timeline'      => ARB_Plays_Tracker::get_timeline($sound_id, 30),
+            'plays_last_30d' => $plays_30d,
+            'likes_total' => ARB_Likes_Manager::get_count($sound_id),
+            'timeline' => ARB_Plays_Tracker::get_timeline($sound_id, 30),
         ], 200);
     }
 
     /**
      * Global stats
      */
-    public static function global_stats($request) {
+    public static function global_stats($request)
+    {
         $cache_key = 'arb:stats:global';
 
-        return arb_cache_get_or_compute($cache_key, 3600, function() {
+        return arb_cache_get_or_compute($cache_key, 3600, function () {
             global $wpdb;
 
             $total_plays = (int) $wpdb->get_var(
@@ -113,10 +120,10 @@ class ARB_REST_Stats {
 
             return [
                 'total_sounds' => wp_count_posts('sound')->publish,
-                'total_plays'  => $total_plays,
-                'total_users'  => count_users()['total_users'],
-                'top_sounds'   => ARB_Aggregator::top_sounds(10),
-                'top_users'    => ARB_Aggregator::top_users(10),
+                'total_plays' => $total_plays,
+                'total_users' => count_users()['total_users'],
+                'top_sounds' => ARB_Aggregator::top_sounds(10),
+                'top_users' => ARB_Aggregator::top_users(10),
                 'plays_timeline' => ARB_Aggregator::plays_timeline(30),
             ];
         });
@@ -125,19 +132,20 @@ class ARB_REST_Stats {
     /**
      * User stats
      */
-    public static function user_stats($request) {
+    public static function user_stats($request)
+    {
         $user_id = (int) $request['id'];
         $cache_key = "arb:stats:user:{$user_id}";
 
-        return arb_cache_get_or_compute($cache_key, 1800, function() use ($user_id) {
+        return arb_cache_get_or_compute($cache_key, 1800, function () use ($user_id) {
             global $wpdb;
 
             $sounds = get_posts([
-                'post_type'      => 'sound',
-                'post_status'    => 'publish',
-                'author'         => $user_id,
+                'post_type' => 'sound',
+                'post_status' => 'publish',
+                'author' => $user_id,
                 'posts_per_page' => -1,
-                'fields'         => 'ids',
+                'fields' => 'ids',
             ]);
 
             $total_plays = 0;
@@ -152,7 +160,7 @@ class ARB_REST_Stats {
                 $total_likes += $likes;
 
                 $top_sounds[] = [
-                    'id'    => $sound_id,
+                    'id' => $sound_id,
                     'title' => get_the_title($sound_id),
                     'plays' => $plays,
                     'likes' => $likes,
@@ -164,11 +172,11 @@ class ARB_REST_Stats {
             $top_sounds = array_slice($top_sounds, 0, 10);
 
             return [
-                'user_id'       => $user_id,
-                'total_sounds'  => count($sounds),
-                'total_plays'   => $total_plays,
-                'total_likes'   => $total_likes,
-                'top_sounds'    => $top_sounds,
+                'user_id' => $user_id,
+                'total_sounds' => count($sounds),
+                'total_plays' => $total_plays,
+                'total_likes' => $total_likes,
+                'top_sounds' => $top_sounds,
                 'plays_timeline' => [], // Could aggregate user's sounds timeline
             ];
         });
@@ -177,13 +185,14 @@ class ARB_REST_Stats {
     /**
      * Leaderboards
      */
-    public static function leaderboards($request) {
+    public static function leaderboards($request)
+    {
         $type = $request->get_param('type');
         $period = $request->get_param('period');
 
         $cache_key = "arb:leaderboards:{$type}:{$period}";
 
-        return arb_cache_get_or_compute($cache_key, 3600, function() use ($type, $period) {
+        return arb_cache_get_or_compute($cache_key, 3600, function () use ($type, $period) {
             if ($type === 'sounds') {
                 $items = ARB_Aggregator::top_sounds(50, $period);
             } else {
@@ -196,8 +205,10 @@ class ARB_REST_Stats {
                 $item['rank'] = $rank++;
             }
 
+            // Return with key matching the type for frontend compatibility
+            $key = $type === 'sounds' ? 'sounds' : 'users';
             return [
-                'items' => $items,
+                $key => $items,
                 'total' => count($items),
             ];
         });

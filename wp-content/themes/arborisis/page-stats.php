@@ -89,7 +89,7 @@ get_header();
 
                     <div id="top-sounds" class="space-y-3">
                         <!-- Loading skeletons -->
-                        <?php for ($i = 0; $i < 10; $i++) : ?>
+                        <?php for ($i = 0; $i < 10; $i++): ?>
                             <div class="skeleton h-16"></div>
                         <?php endfor; ?>
                     </div>
@@ -110,7 +110,7 @@ get_header();
 
                     <div id="top-users" class="space-y-3">
                         <!-- Loading skeletons -->
-                        <?php for ($i = 0; $i < 10; $i++) : ?>
+                        <?php for ($i = 0; $i < 10; $i++): ?>
                             <div class="skeleton h-16"></div>
                         <?php endfor; ?>
                     </div>
@@ -135,7 +135,7 @@ get_header();
                 <h2 class="text-2xl font-display font-bold mb-6">📊 Activité Récente</h2>
                 <div id="recent-activity" class="space-y-4">
                     <!-- Populated by JS -->
-                    <?php for ($i = 0; $i < 5; $i++) : ?>
+                    <?php for ($i = 0; $i < 5; $i++): ?>
                         <div class="skeleton h-20"></div>
                     <?php endfor; ?>
                 </div>
@@ -146,55 +146,83 @@ get_header();
 </div>
 
 <script>
-// Load global stats
-async function loadGlobalStats() {
-    try {
-        const response = await fetch('/wp-json/arborisis/v1/stats/global');
-        const stats = await response.json();
+    // Load global stats
+    async function loadGlobalStats() {
+        try {
+            const response = await fetch('/wp-json/arborisis/v1/stats/global');
+            const stats = await response.json();
 
-        document.getElementById('stat-sounds').textContent = stats.total_sounds?.toLocaleString() || '0';
-        document.getElementById('stat-plays').textContent = stats.total_plays?.toLocaleString() || '0';
-        document.getElementById('stat-users').textContent = stats.total_users?.toLocaleString() || '0';
-        document.getElementById('stat-countries').textContent = stats.countries_count?.toLocaleString() || '0';
+            document.getElementById('stat-sounds').textContent = stats.total_sounds?.toLocaleString() || '0';
+            document.getElementById('stat-plays').textContent = stats.total_plays?.toLocaleString() || '0';
+            document.getElementById('stat-users').textContent = stats.total_users?.toLocaleString() || '0';
+            document.getElementById('stat-countries').textContent = stats.countries_count?.toLocaleString() || '0';
 
-        // Render timeline
-        if (stats.timeline) {
-            renderTimeline(stats.timeline);
+            // Render timeline
+            if (stats.timeline) {
+                renderTimeline(stats.timeline);
+            }
+        } catch (error) {
+            console.error('Failed to load global stats:', error);
         }
-    } catch (error) {
-        console.error('Failed to load global stats:', error);
     }
-}
 
-// Load leaderboards
-async function loadLeaderboards(type = 'sounds', period = '30d') {
-    try {
-        const response = await fetch(`/wp-json/arborisis/v1/stats/leaderboards?type=${type}&period=${period}`);
-        const data = await response.json();
+    // Load leaderboards
+    async function loadLeaderboards(type = 'sounds', period = '30d') {
+        try {
+            const response = await fetch(`/wp-json/arborisis/v1/stats/leaderboards?type=${type}&period=${period}`);
 
-        if (type === 'sounds') {
-            renderTopSounds(data.sounds || data);
-        } else {
-            renderTopUsers(data.users || data);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            // Validate response structure
+            if (type === 'sounds') {
+                const sounds = data.sounds || data;
+                if (!Array.isArray(sounds)) {
+                    console.error('Invalid sounds data received:', data);
+                    renderTopSounds([]);
+                    return;
+                }
+                renderTopSounds(sounds);
+            } else {
+                const users = data.users || data;
+                if (!Array.isArray(users)) {
+                    console.error('Invalid users data received:', data);
+                    renderTopUsers([]);
+                    return;
+                }
+                renderTopUsers(users);
+            }
+        } catch (error) {
+            console.error('Failed to load leaderboards:', error);
+            // Render empty state on error
+            if (type === 'sounds') {
+                renderTopSounds([]);
+            } else {
+                renderTopUsers([]);
+            }
         }
-    } catch (error) {
-        console.error('Failed to load leaderboards:', error);
-    }
-}
-
-function renderTopSounds(sounds) {
-    const container = document.getElementById('top-sounds');
-    if (!sounds || sounds.length === 0) {
-        container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune donnée disponible</p>';
-        return;
     }
 
-    container.innerHTML = sounds.map((sound, index) => `
+    function renderTopSounds(sounds) {
+        const container = document.getElementById('top-sounds');
+
+        // Ensure sounds is an array
+        const soundsArray = Array.isArray(sounds) ? sounds : [];
+
+        if (!soundsArray || soundsArray.length === 0) {
+            container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune donnée disponible</p>';
+            return;
+        }
+
+        container.innerHTML = soundsArray.map((sound, index) => `
         <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-dark-50 dark:hover:bg-dark-800 transition-colors">
             <div class="text-2xl font-bold ${index < 3 ? 'text-primary-600' : 'text-dark-400'} w-8 text-center">
                 ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
             </div>
-            <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.jpg'}"
+            <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.svg'}"
                  alt="${sound.title}"
                  class="w-12 h-12 rounded-lg object-cover">
             <div class="flex-1 min-w-0">
@@ -211,16 +239,20 @@ function renderTopSounds(sounds) {
             </div>
         </div>
     `).join('');
-}
-
-function renderTopUsers(users) {
-    const container = document.getElementById('top-users');
-    if (!users || users.length === 0) {
-        container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune donnée disponible</p>';
-        return;
     }
 
-    container.innerHTML = users.map((user, index) => `
+    function renderTopUsers(users) {
+        const container = document.getElementById('top-users');
+
+        // Ensure users is an array
+        const usersArray = Array.isArray(users) ? users : [];
+
+        if (!usersArray || usersArray.length === 0) {
+            container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune donnée disponible</p>';
+            return;
+        }
+
+        container.innerHTML = usersArray.map((user, index) => `
         <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-dark-50 dark:hover:bg-dark-800 transition-colors">
             <div class="text-2xl font-bold ${index < 3 ? 'text-primary-600' : 'text-dark-400'} w-8 text-center">
                 ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
@@ -242,78 +274,78 @@ function renderTopUsers(users) {
             </div>
         </div>
     `).join('');
-}
+    }
 
-function renderTimeline(timeline) {
-    const container = document.getElementById('timeline-chart');
+    function renderTimeline(timeline) {
+        const container = document.getElementById('timeline-chart');
 
-    // Simple bar chart with SVG
-    const maxValue = Math.max(...timeline.map(d => d.plays || 0));
-    const width = container.clientWidth;
-    const height = 256;
-    const barWidth = width / timeline.length - 2;
+        // Simple bar chart with SVG
+        const maxValue = Math.max(...timeline.map(d => d.plays || 0));
+        const width = container.clientWidth;
+        const height = 256;
+        const barWidth = width / timeline.length - 2;
 
-    const svg = `
+        const svg = `
         <svg width="${width}" height="${height}" class="w-full">
             ${timeline.map((day, i) => {
-                const barHeight = (day.plays / maxValue) * (height - 40);
-                const x = i * (barWidth + 2);
-                const y = height - barHeight - 20;
-                return `
+            const barHeight = (day.plays / maxValue) * (height - 40);
+            const x = i * (barWidth + 2);
+            const y = height - barHeight - 20;
+            return `
                     <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}"
                           fill="currentColor" class="text-primary-500 hover:text-primary-600 transition-colors"
                           rx="2"/>
-                    <text x="${x + barWidth/2}" y="${height - 5}" text-anchor="middle"
+                    <text x="${x + barWidth / 2}" y="${height - 5}" text-anchor="middle"
                           class="text-xs fill-dark-500">
                         ${new Date(day.date).getDate()}
                     </text>
                 `;
-            }).join('')}
+        }).join('')}
         </svg>
     `;
 
-    container.innerHTML = svg;
-}
+        container.innerHTML = svg;
+    }
 
-// Load tag cloud
-async function loadTagCloud() {
-    try {
-        const response = await fetch('/wp-json/wp/v2/sound_tag?per_page=50&orderby=count');
-        const tags = await response.json();
+    // Load tag cloud
+    async function loadTagCloud() {
+        try {
+            const response = await fetch('/wp-json/wp/v2/sound_tag?per_page=50&orderby=count');
+            const tags = await response.json();
 
-        const container = document.getElementById('tag-cloud');
-        container.innerHTML = tags.map(tag => {
-            const size = Math.min(Math.max(tag.count / 10, 0.8), 2.5);
-            return `
+            const container = document.getElementById('tag-cloud');
+            container.innerHTML = tags.map(tag => {
+                const size = Math.min(Math.max(tag.count / 10, 0.8), 2.5);
+                return `
                 <a href="/explore?tag=${tag.slug}"
                    class="hover:text-primary-600 transition-colors"
                    style="font-size: ${size}rem; opacity: ${0.5 + (tag.count / 100)}">
                     ${tag.name}
                 </a>
             `;
-        }).join('');
-    } catch (error) {
-        console.error('Failed to load tag cloud:', error);
-    }
-}
-
-// Load recent activity
-async function loadRecentActivity() {
-    try {
-        const response = await fetch('/wp-json/arborisis/v1/sounds?orderby=recent&per_page=5');
-        const data = await response.json();
-
-        const container = document.getElementById('recent-activity');
-        const sounds = data.sounds || data;
-
-        if (!sounds || sounds.length === 0) {
-            container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune activité récente</p>';
-            return;
+            }).join('');
+        } catch (error) {
+            console.error('Failed to load tag cloud:', error);
         }
+    }
 
-        container.innerHTML = sounds.map(sound => `
+    // Load recent activity
+    async function loadRecentActivity() {
+        try {
+            const response = await fetch('/wp-json/arborisis/v1/sounds?orderby=recent&per_page=5');
+            const data = await response.json();
+
+            const container = document.getElementById('recent-activity');
+            const sounds = data.sounds || data;
+
+            if (!sounds || sounds.length === 0) {
+                container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune activité récente</p>';
+                return;
+            }
+
+            container.innerHTML = sounds.map(sound => `
             <div class="flex items-center gap-4 p-4 rounded-lg bg-dark-50 dark:bg-dark-800">
-                <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.jpg'}"
+                <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.svg'}"
                      alt="${sound.title}"
                      class="w-16 h-16 rounded-lg object-cover">
                 <div class="flex-1">
@@ -330,28 +362,28 @@ async function loadRecentActivity() {
                 </div>
             </div>
         `).join('');
-    } catch (error) {
-        console.error('Failed to load recent activity:', error);
+        } catch (error) {
+            console.error('Failed to load recent activity:', error);
+        }
     }
-}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadGlobalStats();
-    loadLeaderboards('sounds', '30d');
-    loadLeaderboards('users', '30d');
-    loadTagCloud();
-    loadRecentActivity();
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        loadGlobalStats();
+        loadLeaderboards('sounds', '30d');
+        loadLeaderboards('users', '30d');
+        loadTagCloud();
+        loadRecentActivity();
 
-    // Period selectors
-    document.getElementById('sounds-period').addEventListener('change', (e) => {
-        loadLeaderboards('sounds', e.target.value);
+        // Period selectors
+        document.getElementById('sounds-period').addEventListener('change', (e) => {
+            loadLeaderboards('sounds', e.target.value);
+        });
+
+        document.getElementById('users-period').addEventListener('change', (e) => {
+            loadLeaderboards('users', e.target.value);
+        });
     });
-
-    document.getElementById('users-period').addEventListener('change', (e) => {
-        loadLeaderboards('users', e.target.value);
-    });
-});
 </script>
 
 <?php get_footer(); ?>
