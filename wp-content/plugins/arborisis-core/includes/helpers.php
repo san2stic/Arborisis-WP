@@ -3,12 +3,14 @@
  * Helper functions
  */
 
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+    exit;
 
 /**
  * Get Redis client instance
  */
-function arb_redis_client() {
+function arb_redis_client()
+{
     static $redis = null;
 
     if ($redis === null) {
@@ -39,9 +41,11 @@ function arb_redis_client() {
 /**
  * Delete Redis keys by pattern
  */
-function arb_redis_delete_pattern($pattern) {
+function arb_redis_delete_pattern($pattern)
+{
     $redis = arb_redis_client();
-    if (!$redis) return;
+    if (!$redis)
+        return;
 
     try {
         $keys = $redis->keys($pattern);
@@ -56,7 +60,8 @@ function arb_redis_delete_pattern($pattern) {
 /**
  * Cache get or compute with anti-thundering herd
  */
-function arb_cache_get_or_compute($key, $ttl, $compute_fn) {
+function arb_cache_get_or_compute($key, $ttl, $compute_fn)
+{
     $redis = arb_redis_client();
     if (!$redis) {
         return $compute_fn();
@@ -95,14 +100,16 @@ function arb_cache_get_or_compute($key, $ttl, $compute_fn) {
 /**
  * Generate hash for fingerprinting
  */
-function arb_generate_hash($string) {
+function arb_generate_hash($string)
+{
     return hash('sha256', $string);
 }
 
 /**
  * Get client IP address
  */
-function arb_get_client_ip() {
+function arb_get_client_ip()
+{
     $ip = '';
 
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
@@ -119,22 +126,24 @@ function arb_get_client_ip() {
 /**
  * Get user agent
  */
-function arb_get_user_agent() {
+function arb_get_user_agent()
+{
     return $_SERVER['HTTP_USER_AGENT'] ?? '';
 }
 
 /**
  * Calculate Haversine distance between two coordinates
  */
-function arb_haversine_distance($lat1, $lon1, $lat2, $lon2) {
+function arb_haversine_distance($lat1, $lon1, $lat2, $lon2)
+{
     $earth_radius = 6371; // km
 
     $dlat = deg2rad($lat2 - $lat1);
     $dlon = deg2rad($lon2 - $lon1);
 
     $a = sin($dlat / 2) * sin($dlat / 2) +
-         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-         sin($dlon / 2) * sin($dlon / 2);
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dlon / 2) * sin($dlon / 2);
 
     $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
@@ -142,9 +151,50 @@ function arb_haversine_distance($lat1, $lon1, $lat2, $lon2) {
 }
 
 /**
- * Simple geohash encoding (placeholder - use library in production)
+ * Real Geohash encoding
+ * Based on standard Geohash algorithm
  */
-function arb_geohash_encode($lat, $lon, $precision = 12) {
-    // Simplified implementation - use proper library (e.g., lyrixx/geohash) in production
-    return substr(md5("{$lat},{$lon}"), 0, $precision);
+function arb_geohash_encode($lat, $lon, $precision = 12)
+{
+    $chars = '0123456789bcdefghjkmnpqrstuvwxyz';
+    $geohash = '';
+
+    $minLat = -90;
+    $maxLat = 90;
+    $minLon = -180;
+    $maxLon = 180;
+    $even = true;
+    $bit = 0;
+    $ch = 0;
+
+    while (strlen($geohash) < $precision) {
+        if ($even) {
+            $mid = ($minLon + $maxLon) / 2;
+            if ($lon > $mid) {
+                $ch |= (16 >> $bit);
+                $minLon = $mid;
+            } else {
+                $maxLon = $mid;
+            }
+        } else {
+            $mid = ($minLat + $maxLat) / 2;
+            if ($lat > $mid) {
+                $ch |= (16 >> $bit);
+                $minLat = $mid;
+            } else {
+                $maxLat = $mid;
+            }
+        }
+
+        $even = !$even;
+        if ($bit < 4) {
+            $bit++;
+        } else {
+            $geohash .= $chars[$ch];
+            $bit = 0;
+            $ch = 0;
+        }
+    }
+
+    return $geohash;
 }
