@@ -9,7 +9,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 # Install plugin composer dependencies
 WORKDIR /app/plugins
 COPY wp-content/plugins/arborisis-search/composer.json wp-content/plugins/arborisis-search/composer.lock* ./arborisis-search/
-RUN cd arborisis-search && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
+RUN cd arborisis-search && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
 # Node.js build stage for theme
 FROM node:18-alpine AS node-build

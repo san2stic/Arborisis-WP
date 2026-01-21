@@ -31,6 +31,17 @@ else
     echo "WordPress already installed, skipping installation"
 fi
 
+# Check and install Arborisis Search dependencies (fix for volume mounts)
+if [ -d "/var/www/html/wp-content/plugins/arborisis-search" ]; then
+    if [ ! -d "/var/www/html/wp-content/plugins/arborisis-search/vendor" ]; then
+        echo "Arborisis Search vendor directory missing (likely due to volume mount). Installing dependencies..."
+        cd /var/www/html/wp-content/plugins/arborisis-search
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+        cd /var/www/html
+        echo "Arborisis Search dependencies installed."
+    fi
+fi
+
 # Activate plugins
 echo "Activating Arborisis plugins..."
 wp plugin activate arborisis-core --allow-root || echo "Plugin arborisis-core already activated or not found"
