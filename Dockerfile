@@ -78,8 +78,17 @@ RUN echo "pm = dynamic" >> /usr/local/etc/php-fpm.d/www.conf \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application files
-COPY --chown=www-data:www-data . /var/www/html
+# Download and install WordPress core
+RUN curl -o wordpress.tar.gz -fSL https://wordpress.org/latest.tar.gz \
+    && tar -xzf wordpress.tar.gz --strip-components=1 \
+    && rm wordpress.tar.gz \
+    && chown -R www-data:www-data /var/www/html
+
+# Copy custom wp-content (plugins and themes) - this will overlay the default wp-content
+COPY --chown=www-data:www-data ./wp-content /var/www/html/wp-content
+
+# Copy wp-config.php and other custom files
+COPY --chown=www-data:www-data ./wp-config.php /var/www/html/wp-config.php
 
 # Copy composer dependencies from build stage
 COPY --from=composer-build --chown=www-data:www-data /app/vendor ./vendor
