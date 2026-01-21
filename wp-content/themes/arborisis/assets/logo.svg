@@ -1,0 +1,18 @@
+<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="40" height="40" rx="8" fill="url(#logoGrad)"/>
+
+  <!-- Musical note icon -->
+  <g transform="translate(10, 8)">
+    <circle cx="6" cy="18" r="3" fill="white"/>
+    <rect x="5" y="6" width="2" height="12" fill="white"/>
+    <path d="M 7 6 Q 13 4, 17 8 L 17 16 Q 13 14, 7 16 Z" fill="white"/>
+  </g>
+</svg>

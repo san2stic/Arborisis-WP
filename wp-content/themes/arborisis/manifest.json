@@ -1,0 +1,60 @@
+{
+    "name": "Arborisis",
+    "short_name": "Arborisis",
+    "description": "Plateforme collaborative de field recording. Découvrez, partagez et explorez des milliers d'enregistrements sonores géolocalisés.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#22c55e",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/wp-content/themes/arborisis/assets/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/wp-content/themes/arborisis/assets/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "music",
+        "audio",
+        "education"
+    ],
+    "screenshots": [
+        {
+            "src": "/wp-content/themes/arborisis/assets/screenshot-1.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "label": "Homepage with sound discovery"
+        },
+        {
+            "src": "/wp-content/themes/arborisis/assets/screenshot-2.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "label": "Interactive map"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Explore Sounds",
+            "url": "/explore",
+            "description": "Browse sound library"
+        },
+        {
+            "name": "Interactive Map",
+            "url": "/map",
+            "description": "Explore sounds on map"
+        },
+        {
+            "name": "Upload",
+            "url": "/upload",
+            "description": "Upload new recording"
+        }
+    ]
+}

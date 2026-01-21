@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  # WordPress + Nginx + PHP-FPM
+  wordpress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arborisis-wordpress
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      - WP_ENV=production
+      - DB_HOST=mysql
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - OPENSEARCH_HOST=opensearch
+      - S3_ENDPOINT=http://minio:9000
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content/uploads:/var/www/html/wp-content/uploads
+      - ./wp-content/plugins:/var/www/html/wp-content/plugins
+      - ./wp-content/themes:/var/www/html/wp-content/themes
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      opensearch:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - arborisis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MySQL Database
+  mysql:
+    image: mariadb:10.11
+    container_name: arborisis-mysql
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init.cnf:/etc/mysql/conf.d/custom.cnf
+    networks:
+      - arborisis-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: arborisis-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - arborisis-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # OpenSearch
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: arborisis-opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
+      - plugins.security.disabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+      - ./opensearch-mapping.json:/usr/share/opensearch/mapping.json:ro
+      - ./docker/init-opensearch.sh:/usr/share/opensearch/init.sh:ro
+    networks:
+      - arborisis-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u admin:${OPENSEARCH_PASSWORD} https://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # MinIO S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    container_name: arborisis-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    env_file: .env.production
+    environment:
+      - MINIO_ROOT_USER=${S3_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    networks:
+      - arborisis-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cloudflared Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: arborisis-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    networks:
+      - arborisis-network
+
+networks:
+  arborisis-network:
+    driver: bridge
+
+volumes:
+  wordpress_data:
+    driver: local
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  opensearch_data:
+    driver: local
+  minio_data:
+    driver: local

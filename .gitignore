@@ -1,0 +1,58 @@
+# WordPress
+wp-config.php
+.htaccess
+
+# Environment
+.env
+.env.local
+.env.production
+.env.production.local
+
+# Composer
+/vendor/
+composer.lock
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build
+/wp-content/themes/*/dist/
+/wp-content/themes/*/node_modules/
+
+# Uploads
+/wp-content/uploads/
+
+# Cache
+/wp-content/cache/
+/wp-content/object-cache.php
+*.cache
+
+# Logs
+*.log
+/wp-content/debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary
+/tmp/
+/temp/
+
+# Backup
+*.sql
+*.sql.gz
+*.backup

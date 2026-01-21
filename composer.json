@@ -1,0 +1,34 @@
+{
+  "name": "arborisis/wordpress",
+  "description": "Arborisis Field Recording Platform - WordPress Implementation",
+  "type": "project",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.2",
+    "aws/aws-sdk-php": "^3.300",
+    "opensearch-project/opensearch-php": "^2.3",
+    "predis/predis": "^2.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Arborisis\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+      "composer/installers": true,
+      "php-http/discovery": true
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php -r \"if (!file_exists('.env')) { copy('.env.example', '.env'); }\""
+    ]
+  }
+}
