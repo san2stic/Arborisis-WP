@@ -1,45 +1,41 @@
 #!/bin/bash
-# Quick deploy script - loads env vars and builds/starts containers
-# Usage: ./docker-compose.env.sh [build|up|restart|logs]
+# Docker Compose deployment script with proper environment handling
+# This version creates a .env file for docker-compose to read automatically
 
 set -e
 
-ENV_FILE=".env.production.local"
-COMMAND="${1:-up}"
+SOURCE_ENV="${1:-.env.production.local}"
+DOCKER_ENV=".env"
+COMMAND="${2:-up}"
 
-# Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${YELLOW}🚀 Arborisis WordPress Docker Deployment${NC}"
 echo ""
 
-# Check if env file exists
-if [ ! -f "$ENV_FILE" ]; then
-    echo -e "${RED}❌ Error: $ENV_FILE not found${NC}"
+# Check if source env file exists
+if [ ! -f "$SOURCE_ENV" ]; then
+    echo -e "${RED}❌ Error: $SOURCE_ENV not found${NC}"
     echo "Please create it from .env.example:"
     echo "  cp .env.example .env.production.local"
     echo "  nano .env.production.local"
     exit 1
 fi
 
-# Load environment variables safely
-echo -e "${YELLOW}📝 Loading environment variables...${NC}"
-while IFS= read -r line || [ -n "$line" ]; do
-    if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
-        continue
-    fi
-    export "$line"
-done < "$ENV_FILE"
+# Copy the env file to .env (docker-compose reads this automatically)
+echo -e "${YELLOW}📝 Preparing environment for Docker Compose...${NC}"
+cp "$SOURCE_ENV" "$DOCKER_ENV"
 
-# Verify critical variables are set
+# Verify critical variables exist in the file
+echo -e "${YELLOW}🔍 Validating environment variables...${NC}"
 REQUIRED_VARS=("DB_NAME" "DB_USER" "DB_PASSWORD" "MYSQL_ROOT_PASSWORD")
 MISSING_VARS=()
 
 for var in "${REQUIRED_VARS[@]}"; do
-    if [ -z "${!var}" ]; then
+    if ! grep -q "^${var}=" "$DOCKER_ENV"; then
         MISSING_VARS+=("$var")
     fi
 done
@@ -48,48 +44,65 @@ if [ ${#MISSING_VARS[@]} -gt 0 ]; then
     echo -e "${RED}❌ Missing required environment variables:${NC}"
     printf '   - %s\n' "${MISSING_VARS[@]}"
     echo ""
-    echo "Please set them in $ENV_FILE"
+    echo "Please set them in $SOURCE_ENV"
+    rm -f "$DOCKER_ENV"
     exit 1
 fi
 
-echo -e "${GREEN}✅ Environment loaded${NC}"
+echo -e "${GREEN}✅ Environment prepared${NC}"
 echo ""
 
 # Execute docker compose command
 case "$COMMAND" in
     build)
         echo -e "${YELLOW}🔨 Building containers...${NC}"
-        sudo -E docker compose build
+        sudo docker compose build
         ;;
     up)
         echo -e "${YELLOW}🚀 Starting containers...${NC}"
-        sudo -E docker compose up -d
+        sudo docker compose up -d
         echo ""
         echo -e "${GREEN}✅ Containers started${NC}"
-        sudo -E docker compose ps
+        sudo docker compose ps
+        ;;
+    down)
+        echo -e "${YELLOW}🛑 Stopping containers...${NC}"
+        sudo docker compose down
         ;;
     restart)
         echo -e "${YELLOW}🔄 Restarting containers...${NC}"
-        sudo -E docker compose down
-        sudo -E docker compose up -d
+        sudo docker compose down
+        sudo docker compose up -d
         echo ""
         echo -e "${GREEN}✅ Containers restarted${NC}"
-        sudo -E docker compose ps
+        sudo docker compose ps
         ;;
     logs)
         echo -e "${YELLOW}📋 Showing logs...${NC}"
-        sudo -E docker compose logs -f
+        sudo docker compose logs -f
+        ;;
+    ps)
+        sudo docker compose ps
         ;;
     *)
         echo -e "${RED}❌ Unknown command: $COMMAND${NC}"
         echo ""
-        echo "Usage: $0 [build|up|restart|logs]"
+        echo "Usage: $0 [env-file] [command]"
         echo ""
         echo "Commands:"
         echo "  build   - Build Docker images"
         echo "  up      - Start containers (default)"
+        echo "  down    - Stop containers"
         echo "  restart - Stop and start containers"
         echo "  logs    - Show container logs"
+        echo "  ps      - Show container status"
+        rm -f "$DOCKER_ENV"
         exit 1
         ;;
 esac
+
+# Note: We keep .env file for docker-compose to use
+# Remove it only on explicit down command
+if [ "$COMMAND" = "down" ]; then
+    rm -f "$DOCKER_ENV"
+fi
