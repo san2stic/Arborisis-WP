@@ -20,7 +20,7 @@ services:
     volumes:
       - ./wp-content/uploads:/var/www/html/wp-content/uploads
       - ./wp-content/plugins:/var/www/html/wp-content/plugins
-      - ./wp-content/themes:/var/www/html/wp-content/themes
+      # - ./wp-content/themes:/var/www/html/wp-content/themes # Disable to use built assets from image
     depends_on:
       mysql:
         condition: service_healthy
