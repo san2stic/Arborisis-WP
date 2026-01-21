@@ -17,6 +17,7 @@ git pull
 - Plugin audio avec autoloader Composer
 - Scripts de déploiement
 - Configuration .env corrigée
+- composer.lock fixé pour PHP 8.2
 - Documentation complète
 
 ---
