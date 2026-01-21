@@ -37,6 +37,6 @@ cat > /tmp/cors.json << 'EOF'
   ]
 }
 EOF
-mc cors set /tmp/cors.json myminio/${S3_BUCKET}
+mc cors set myminio/${S3_BUCKET} /tmp/cors.json
 
 echo "✅ MinIO initialization complete"
