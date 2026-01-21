@@ -23,20 +23,9 @@ fi
 echo "🔓 Setting public read policy..."
 mc anonymous set download myminio/${S3_BUCKET}
 
-# Configure CORS for browser uploads
-echo "🌐 Configuring CORS..."
-cat > /tmp/cors.xml << 'EOF'
-<CORSConfiguration>
-  <CORSRule>
-    <AllowedOrigin>*</AllowedOrigin>
-    <AllowedMethod>GET</AllowedMethod>
-    <AllowedMethod>HEAD</AllowedMethod>
-    <AllowedMethod>PUT</AllowedMethod>
-    <AllowedMethod>POST</AllowedMethod>
-    <AllowedHeader>*</AllowedHeader>
-  </CORSRule>
-</CORSConfiguration>
-EOF
-mc cors set myminio/${S3_BUCKET} /tmp/cors.xml
+# Configure CORS for browser uploads using environment variable
+echo "🌐 Configuring CORS via MinIO environment..."
+echo "⚠️  CORS configuration requires MinIO restart with MINIO_API_CORS_ALLOW_ORIGIN='*'"
+echo "ℹ️  This will be handled by docker-compose environment variables"
 
 echo "✅ MinIO initialization complete"
