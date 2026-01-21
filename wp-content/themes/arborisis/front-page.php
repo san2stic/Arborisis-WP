@@ -257,9 +257,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const trending = await trendingRes.json();
 
         const trendingContainer = document.getElementById('trending-sounds');
-        trendingContainer.innerHTML = trending.map(sound => createSoundCard(sound)).join('');
+
+        if (trending && Array.isArray(trending.sounds)) {
+            trendingContainer.innerHTML = trending.sounds.map(sound => createSoundCard(sound)).join('');
+        } else {
+            trendingContainer.innerHTML = '<p class="text-center text-dark-500 py-8">Aucun son tendance disponible</p>';
+        }
     } catch (error) {
         console.error('Failed to load trending sounds:', error);
+        document.getElementById('trending-sounds').innerHTML = '<p class="text-center text-red-500 py-8">Erreur de chargement</p>';
     }
 
     // Load recent sounds
@@ -268,9 +274,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const recent = await recentRes.json();
 
         const recentContainer = document.getElementById('recent-sounds');
-        recentContainer.innerHTML = recent.map(sound => createSoundCard(sound)).join('');
+
+        if (recent && Array.isArray(recent.sounds)) {
+            recentContainer.innerHTML = recent.sounds.map(sound => createSoundCard(sound)).join('');
+        } else {
+            recentContainer.innerHTML = '<p class="text-center text-dark-500 py-8">Aucun son récent disponible</p>';
+        }
     } catch (error) {
         console.error('Failed to load recent sounds:', error);
+        document.getElementById('recent-sounds').innerHTML = '<p class="text-center text-red-500 py-8">Erreur de chargement</p>';
     }
 });
 

@@ -173,9 +173,9 @@ async function loadLeaderboards(type = 'sounds', period = '30d') {
         const data = await response.json();
 
         if (type === 'sounds') {
-            renderTopSounds(data);
+            renderTopSounds(data.sounds || data);
         } else {
-            renderTopUsers(data);
+            renderTopUsers(data.users || data);
         }
     } catch (error) {
         console.error('Failed to load leaderboards:', error);
@@ -301,9 +301,16 @@ async function loadTagCloud() {
 async function loadRecentActivity() {
     try {
         const response = await fetch('/wp-json/arborisis/v1/sounds?orderby=recent&per_page=5');
-        const sounds = await response.json();
+        const data = await response.json();
 
         const container = document.getElementById('recent-activity');
+        const sounds = data.sounds || data;
+
+        if (!sounds || sounds.length === 0) {
+            container.innerHTML = '<p class="text-center text-dark-500 py-8">Aucune activité récente</p>';
+            return;
+        }
+
         container.innerHTML = sounds.map(sound => `
             <div class="flex items-center gap-4 p-4 rounded-lg bg-dark-50 dark:bg-dark-800">
                 <img src="${sound.thumbnail || '/wp-content/themes/arborisis/assets/placeholder.jpg'}"

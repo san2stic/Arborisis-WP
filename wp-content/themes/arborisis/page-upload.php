@@ -407,8 +407,18 @@ get_header();
 
             const result = await response.json();
 
-            // Redirect to sound page
-            window.location.href = `/sound/${result.sound_id}`;
+            if (result.success && result.sound_id) {
+                // Verify sound exists before redirect
+                const checkRes = await fetch(`/wp-json/arborisis/v1/sounds/${result.sound_id}`);
+
+                if (checkRes.ok) {
+                    window.location.href = `/sound/${result.sound_id}`;
+                } else {
+                    throw new Error('Son créé mais non accessible. Vérifiez votre profil.');
+                }
+            } else {
+                throw new Error(result.message || 'Échec de la finalisation');
+            }
 
         } catch (error) {
             console.error('Publication failed:', error);

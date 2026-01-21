@@ -151,6 +151,7 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+        wp_script_add_data('arborisis-map', 'type', 'module');
 
         if (isset($map['css'])) {
             foreach ($map['css'] as $css) {
@@ -174,6 +175,7 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+        wp_script_add_data('arborisis-graph', 'type', 'module');
 
         if (isset($graph['css'])) {
             foreach ($graph['css'] as $css) {
@@ -197,6 +199,7 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
+        wp_script_add_data('arborisis-player', 'type', 'module');
 
         if (isset($player['css'])) {
             foreach ($player['css'] as $css) {
