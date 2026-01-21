@@ -22,13 +22,27 @@ git pull
 
 ---
 
-## ✅ Étape 2 : Copier la Configuration
+## ✅ Étape 2 : Copier et Configurer l'Environnement
 
 ```bash
 cp .env.production.local .env
 ```
 
-Cela crée le fichier `.env` avec les mots de passe correctement quotés.
+**IMPORTANT** : Vérifier que `S3_PUBLIC_ENDPOINT` est correct :
+```bash
+grep S3_PUBLIC_ENDPOINT .env
+```
+
+Devrait afficher :
+```
+S3_PUBLIC_ENDPOINT=https://s3.arborisis.social
+```
+
+Si vous voyez `http://localhost:9000`, éditer :
+```bash
+nano .env
+# Changer en : S3_PUBLIC_ENDPOINT=https://s3.arborisis.social
+```
 
 ---
 
@@ -76,7 +90,36 @@ Vous devriez voir :
 
 ---
 
-## ✅ Étape 5 : Vérifier que Tout Fonctionne
+## ✅ Étape 5 : Configurer Cloudflare Tunnel pour MinIO
+
+**Accéder au dashboard Cloudflare** :
+1. Aller sur https://one.dash.cloudflare.com/
+2. **Access** → **Tunnels**
+3. Cliquer sur votre tunnel
+4. **Configure** → **Public Hostname**
+5. Cliquer **Add a public hostname**
+
+**Configuration** :
+- Subdomain : `s3`
+- Domain : `arborisis.social`
+- Path : (vide)
+- Type : `HTTP`
+- URL : `minio:9000`
+
+Cliquer **Save**.
+
+**Tester** :
+```bash
+curl -I https://s3.arborisis.social/minio/health/live
+```
+
+Devrait retourner `200 OK`.
+
+Voir le guide complet : [CONFIGURE-MINIO-CLOUDFLARE.md](CONFIGURE-MINIO-CLOUDFLARE.md)
+
+---
+
+## ✅ Étape 6 : Vérifier que Tout Fonctionne
 
 ```bash
 sudo ./check-s3-env.sh
@@ -91,7 +134,7 @@ sudo ./check-s3-env.sh
 
 ---
 
-## ✅ Étape 6 : Tester l'Upload
+## ✅ Étape 7 : Tester l'Upload
 
 1. Ouvrir : https://arborisis.social/upload
 2. Sélectionner un fichier audio (MP3, WAV, FLAC, OGG)
@@ -105,11 +148,24 @@ sudo ./check-s3-env.sh
 - Redirection vers la page du son
 
 **Si ça échoue** :
-Aller à l'Étape 7 (Troubleshooting)
+Aller à l'Étape 8 (Troubleshooting)
 
 ---
 
-## 🐛 Étape 7 : Troubleshooting
+## 🐛 Étape 8 : Troubleshooting
+
+### Erreur : 403 Forbidden lors de l'upload vers MinIO
+
+❌ **Problème** : Le navigateur ne peut pas accéder à MinIO
+
+**Symptôme** :
+```
+PUT http://localhost:9000/arborisis-audio/... 403 (Forbidden)
+```
+
+✅ **Solution** : Configurer Cloudflare Tunnel (Étape 5)
+
+MinIO doit être accessible publiquement via HTTPS. Voir [CONFIGURE-MINIO-CLOUDFLARE.md](CONFIGURE-MINIO-CLOUDFLARE.md)
 
 ### Erreur : "Composer dependencies require PHP >= 8.4.0"
 
