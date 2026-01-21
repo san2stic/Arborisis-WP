@@ -299,11 +299,13 @@ get_header();
             });
 
             if (!presignResponse.ok) {
-                throw new Error('Failed to get presigned URL');
+                const errorData = await presignResponse.json();
+                console.error('Presign error:', errorData);
+                throw new Error(errorData.message || 'Failed to get presigned URL');
             }
 
-            const { upload_url, s3_key } = await presignResponse.json();
-            uploadedS3Key = s3_key;
+            const { upload_url, key } = await presignResponse.json();
+            uploadedS3Key = key;
 
             // Upload to S3 with progress
             const uploadProgress = document.getElementById('upload-progress');
@@ -361,17 +363,33 @@ get_header();
         submitBtn.innerHTML = '<svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Publication...';
 
         try {
-            const formData = {
-                s3_key: uploadedS3Key,
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const locationName = document.getElementById('location-name').value;
+
+            const soundData = {
                 title: document.getElementById('title').value,
-                description: document.getElementById('description').value,
+                content: document.getElementById('description').value,
                 tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
                 license: document.getElementById('license').value,
-                location_name: document.getElementById('location-name').value,
-                latitude: parseFloat(document.getElementById('latitude').value) || null,
-                longitude: parseFloat(document.getElementById('longitude').value) || null,
                 recorded_at: document.getElementById('recorded-at').value,
                 equipment: document.getElementById('equipment').value,
+            };
+
+            // Add geo data if coordinates are provided
+            if (!isNaN(latitude) && !isNaN(longitude)) {
+                soundData.geo = {
+                    lat: latitude,
+                    lon: longitude,
+                };
+                if (locationName) {
+                    soundData.geo.name = locationName;
+                }
+            }
+
+            const formData = {
+                key: uploadedS3Key,
+                sound_data: soundData,
             };
 
             const response = await fetch('/wp-json/arborisis/v1/upload/finalize', {

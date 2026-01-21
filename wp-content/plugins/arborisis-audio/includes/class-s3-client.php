@@ -63,8 +63,17 @@ class ARB_S3_Client {
         ]);
 
         $request = $client->createPresignedRequest($cmd, $expires);
+        $url = (string) $request->getUri();
 
-        return (string) $request->getUri();
+        // Replace internal endpoint with public endpoint if configured
+        $internal_endpoint = getenv('S3_ENDPOINT');
+        $public_endpoint = getenv('S3_PUBLIC_ENDPOINT') ?: $internal_endpoint;
+
+        if ($internal_endpoint && $public_endpoint && $internal_endpoint !== $public_endpoint) {
+            $url = str_replace($internal_endpoint, $public_endpoint, $url);
+        }
+
+        return $url;
     }
 
     /**
@@ -150,7 +159,8 @@ class ARB_S3_Client {
      * Get public URL for object
      */
     public static function get_public_url($key) {
-        $endpoint = rtrim(getenv('S3_ENDPOINT'), '/');
+        $endpoint = getenv('S3_PUBLIC_ENDPOINT') ?: getenv('S3_ENDPOINT');
+        $endpoint = rtrim($endpoint, '/');
         $bucket   = getenv('S3_BUCKET');
 
         return "{$endpoint}/{$bucket}/{$key}";
