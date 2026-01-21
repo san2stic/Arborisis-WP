@@ -41,6 +41,23 @@ define('WP_DEBUG', getenv('WP_ENV') !== 'production');
 define('WP_DEBUG_LOG', getenv('WP_ENV') !== 'production');
 define('WP_DEBUG_DISPLAY', false);
 
+// Handle SSL behind Reverse Proxy (Cloudflare)
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
+// Fix invalid host header issues
+if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+    $_SERVER['HTTP_HOST'] = $_SERVER['HTTP_X_FORWARDED_HOST'];
+}
+
+// Define WordPress URL
+if (isset($_SERVER['HTTP_HOST'])) {
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https://' : 'http://';
+    define('WP_HOME', $protocol . $_SERVER['HTTP_HOST']);
+    define('WP_SITEURL', $protocol . $_SERVER['HTTP_HOST']);
+}
+
 // WordPress URLs (will be set from first request)
 if (!defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/');

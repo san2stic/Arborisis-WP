@@ -11,6 +11,14 @@ WORKDIR /app/plugins
 COPY wp-content/plugins/arborisis-search/composer.json wp-content/plugins/arborisis-search/composer.lock* ./arborisis-search/
 RUN cd arborisis-search && composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
 
+# Node.js build stage for theme
+FROM node:18-alpine AS node-build
+WORKDIR /app
+COPY wp-content/themes/arborisis/package.json wp-content/themes/arborisis/package-lock.json ./
+RUN npm ci
+COPY wp-content/themes/arborisis ./
+RUN npm run build
+
 # Main image
 FROM php:8.2-fpm-alpine AS base
 
@@ -96,6 +104,9 @@ COPY --chown=www-data:www-data ./wp-content /var/www/html/wp-content
 # Copy composer dependencies from build stage
 COPY --from=composer-build --chown=www-data:www-data /app/vendor ./vendor
 COPY --from=composer-build --chown=www-data:www-data /app/plugins/arborisis-search/vendor ./wp-content/plugins/arborisis-search/vendor
+
+# Copy compiled theme assets
+COPY --from=node-build --chown=www-data:www-data /app/dist ./wp-content/themes/arborisis/dist
 
 # Copy composer binary for potential runtime use
 COPY --from=composer-build /usr/bin/composer /usr/local/bin/composer
