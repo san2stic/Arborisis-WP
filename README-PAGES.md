@@ -2,18 +2,29 @@
 
 Ce guide explique comment créer automatiquement toutes les pages WordPress pour Arborisis.
 
-## Script de création automatique
+## Plugin de création automatique (MÉTHODE RECOMMANDÉE) ✅
 
-Un script `create-pages.php` a été créé pour automatiser la création de toutes les pages nécessaires.
+Un plugin WordPress a été créé pour simplifier la création des pages.
 
-### Méthode 1: Via le navigateur (Recommandé)
+### Installation et utilisation
 
-1. Connectez-vous en tant qu'administrateur WordPress
-2. Accédez à l'URL: `https://arborisis.social/create-pages.php`
-3. Le script va créer automatiquement toutes les pages manquantes
-4. Vous verrez un rapport détaillé des pages créées
+1. **Activer le plugin**
+   - Allez dans WordPress Admin → Extensions → Extensions installées
+   - Cherchez "Arborisis Page Creator"
+   - Cliquez sur "Activer"
 
-### Méthode 2: Via la ligne de commande
+2. **Créer les pages**
+   - Allez dans WordPress Admin → Outils → Créer les pages
+   - Cliquez sur le bouton "🚀 Créer toutes les pages"
+   - Consultez le rapport de création
+
+3. **Désactiver le plugin (optionnel)**
+   - Une fois les pages créées, vous pouvez désactiver le plugin
+   - Il peut être réactivé plus tard si nécessaire
+
+### Alternative: Script PHP standalone
+
+Si le plugin ne fonctionne pas, vous pouvez utiliser le script en ligne de commande:
 
 ```bash
 cd /Users/bastienjavaux/Documents/Arborisis\ Wordpress
