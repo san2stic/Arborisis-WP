@@ -26,15 +26,15 @@ for page_info in "${PAGES[@]}"; do
     IFS=':' read -r slug title template <<< "$page_info"
     
     # Check if page exists
-    if docker exec "$CONTAINER_NAME" wp post list --post_type=page --name="$slug" --format=ids | grep -q "[0-9]"; then
+    if docker exec "$CONTAINER_NAME" wp post list --post_type=page --name="$slug" --format=ids --allow-root | grep -q "[0-9]"; then
         echo "✅ Page '$title' ($slug) already exists."
         
         # Update template just in case
-        ID=$(docker exec "$CONTAINER_NAME" wp post list --post_type=page --name="$slug" --format=ids)
-        docker exec "$CONTAINER_NAME" wp post update "$ID" --meta_input='{"_wp_page_template":"'"$template"'"}' --quiet
+        ID=$(docker exec "$CONTAINER_NAME" wp post list --post_type=page --name="$slug" --format=ids --allow-root)
+        docker exec "$CONTAINER_NAME" wp post update "$ID" --meta_input='{"_wp_page_template":"'"$template"'"}' --quiet --allow-root
     else
         echo "➕ Creating page '$title' ($slug)..."
-        docker exec "$CONTAINER_NAME" wp post create --post_type=page --post_title="$title" --post_name="$slug" --post_status=publish --meta_input='{"_wp_page_template":"'"$template"'"}'
+        docker exec "$CONTAINER_NAME" wp post create --post_type=page --post_title="$title" --post_name="$slug" --post_status=publish --meta_input='{"_wp_page_template":"'"$template"'"}' --allow-root
     fi
 done
 
