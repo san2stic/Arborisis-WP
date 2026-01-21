@@ -58,6 +58,22 @@ wp rewrite structure '/%postname%/' --allow-root
 
 echo "WordPress initialization complete!"
 
+# Create default pages if they don't exist
+echo "Creating default pages..."
+pages=("explore" "map" "graph" "stats")
+titles=("Explorer" "Carte" "Graphe" "Stats")
+
+for i in "${!pages[@]}"; do
+    slug="${pages[$i]}"
+    title="${titles[$i]}"
+    if ! wp post list --name="$slug" --post_type=page --format=ids --allow-root | grep -q .; then
+        echo "Creating page: $title ($slug)"
+        wp post create --post_type=page --post_title="$title" --post_name="$slug" --post_status='publish' --allow-root
+    else
+        echo "Page exists: $title"
+    fi
+done
+
 # Create cron jobs info file
 cat > /var/www/html/CRON-INFO.txt << 'EOF'
 # Arborisis Cron Jobs
