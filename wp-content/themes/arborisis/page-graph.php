@@ -24,24 +24,24 @@ get_header();
                     </h1>
 
                     <p class="text-sm text-dark-600 dark:text-dark-400 mb-4">
-                        Découvrez des sons similaires à travers leurs tags, leur géolocalisation et leur popularité. Cliquez sur un son pour l'explorer.
+                        Découvrez des sons similaires à travers leurs tags, leur géolocalisation et leur popularité.
+                        Cliquez sur un son pour l'explorer.
                     </p>
 
                     <!-- Search seed -->
                     <div class="relative mb-4">
-                        <input
-                            type="search"
-                            id="graph-search"
-                            class="input pr-10"
-                            placeholder="Rechercher un son pour commencer..."
-                        >
-                        <svg class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        <input type="search" id="graph-search" class="input pr-10"
+                            placeholder="Rechercher un son pour commencer...">
+                        <svg class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-dark-400" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
 
                     <!-- Search Results Dropdown -->
-                    <div id="search-results" class="hidden mb-4 max-h-60 overflow-y-auto custom-scrollbar bg-white dark:bg-dark-800 rounded-lg border border-dark-200 dark:border-dark-700">
+                    <div id="search-results"
+                        class="hidden mb-4 max-h-60 overflow-y-auto custom-scrollbar bg-white dark:bg-dark-800 rounded-lg border border-dark-200 dark:border-dark-700">
                         <!-- Populated by JS -->
                     </div>
 
@@ -131,19 +131,22 @@ get_header();
                     <div class="mt-4 pt-4 border-t border-white/20 dark:border-dark-700/50 space-y-2">
                         <button id="center-graph" class="w-full btn btn-ghost btn-sm justify-start">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                             Centrer la vue
                         </button>
                         <button id="reset-graph" class="w-full btn btn-ghost btn-sm justify-start">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
                             Réinitialiser
                         </button>
                         <button id="export-png" class="w-full btn btn-ghost btn-sm justify-start">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
                             Exporter PNG
                         </button>
@@ -156,12 +159,15 @@ get_header();
     </div>
 
     <!-- Sound Details Panel (shown when node clicked) -->
-    <div id="sound-panel" class="hidden absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-auto max-w-2xl w-full mx-4">
+    <div id="sound-panel"
+        class="hidden absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-auto max-w-2xl w-full mx-4">
         <div class="card shadow-2xl">
             <div class="card-body">
-                <button id="close-panel" class="absolute top-4 right-4 w-8 h-8 hover:bg-dark-100 dark:hover:bg-dark-700 rounded-lg flex items-center justify-center transition-colors">
+                <button id="close-panel"
+                    class="absolute top-4 right-4 w-8 h-8 hover:bg-dark-100 dark:hover:bg-dark-700 rounded-lg flex items-center justify-center transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
 
@@ -184,7 +190,9 @@ get_header();
     <!-- Loading Overlay -->
     <div id="graph-loading" class="absolute inset-0 bg-white dark:bg-dark-900 flex items-center justify-center z-30">
         <div class="text-center">
-            <div class="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <div
+                class="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4">
+            </div>
             <div class="text-lg font-medium text-dark-700 dark:text-dark-300">Initialisation du graphe...</div>
         </div>
     </div>
@@ -199,159 +207,185 @@ get_header();
 </div>
 
 <script>
-// Graph configuration
-window.graphConfig = {
-    defaultDepth: 2,
-    defaultMaxNodes: 50,
-    apiEndpoint: '/wp-json/arborisis/v1/graph/explore',
-    forceStrength: {
-        charge: -300,
-        link: 1,
-        collide: 30,
-    },
-    nodeRadius: {
-        min: 5,
-        max: 20,
-    },
-    colors: {
-        primary: '#16a34a',
-        secondary: '#9333ea',
-        edge: '#94a3b8',
-    },
-};
+    // Graph configuration
+    window.graphConfig = {
+        defaultDepth: 2,
+        defaultMaxNodes: 50,
+        apiEndpoint: '/wp-json/arborisis/v1/graph/explore',
+        forceStrength: {
+            charge: -300,
+            link: 1,
+            collide: 30,
+        },
+        nodeRadius: {
+            min: 5,
+            max: 20,
+        },
+        colors: {
+            primary: '#16a34a',
+            secondary: '#9333ea',
+            edge: '#94a3b8',
+        },
+    };
 
-// UI Controls
-document.addEventListener('DOMContentLoaded', () => {
-    let currentDepth = 2;
-    let currentMaxNodes = 50;
+    // Fallback: Remove loading overlay if it takes too long
+    setTimeout(() => {
+        const loader = document.getElementById('graph-loading');
+        if (loader && !loader.classList.contains('hidden')) {
+            console.warn('Graph loading timed out, forcing removal of loader');
+            loader.classList.add('hidden');
 
-    // Depth buttons
-    document.querySelectorAll('[data-depth]').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('[data-depth]').forEach(btn => {
-                btn.classList.remove('btn-primary');
+            // Show error message if svg is empty
+            const svg = document.getElementById('graph-svg');
+            if (svg && svg.childElementCount === 0) {
+                const container = svg.parentElement;
+                if (container) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = "absolute inset-0 flex items-center justify-center pointer-events-none";
+                    errorDiv.innerHTML = `
+                    <div class="text-center p-4 bg-white/80 dark:bg-dark-900/80 rounded-xl backdrop-blur">
+                        <p class="font-bold text-dark-900 dark:text-dark-50 mb-2">Le graphe n'a pas pu être chargé</p>
+                        <p class="text-sm text-dark-600 dark:text-dark-400">Veuillez rafraîchir la page ou réessayer plus tard.</p>
+                    </div>
+                `;
+                    container.appendChild(errorDiv);
+                }
+            }
+        }
+    }, 5000);
+
+    // UI Controls
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentDepth = 2;
+        let currentMaxNodes = 50;
+
+        // Depth buttons
+        document.querySelectorAll('[data-depth]').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('[data-depth]').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                });
+                button.classList.add('btn-primary');
+                currentDepth = parseInt(button.dataset.depth);
+
+                if (window.arbGraph && window.arbGraph.currentSeed) {
+                    window.arbGraph.explore(window.arbGraph.currentSeed, currentDepth, currentMaxNodes);
+                }
             });
-            button.classList.add('btn-primary');
-            currentDepth = parseInt(button.dataset.depth);
+        });
 
-            if (window.arbGraph && window.arbGraph.currentSeed) {
-                window.arbGraph.explore(window.arbGraph.currentSeed, currentDepth, currentMaxNodes);
+        // Max nodes buttons
+        document.querySelectorAll('[data-max-nodes]').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('[data-max-nodes]').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                });
+                button.classList.add('btn-primary');
+                currentMaxNodes = parseInt(button.dataset.maxNodes);
+
+                if (window.arbGraph && window.arbGraph.currentSeed) {
+                    window.arbGraph.explore(window.arbGraph.currentSeed, currentDepth, currentMaxNodes);
+                }
+            });
+        });
+
+        // Random start
+        document.getElementById('random-start')?.addEventListener('click', async () => {
+            if (window.arbGraph && window.arbGraph.randomStart) {
+                await window.arbGraph.randomStart();
             }
         });
-    });
 
-    // Max nodes buttons
-    document.querySelectorAll('[data-max-nodes]').forEach(button => {
-        button.addEventListener('click', () => {
-            document.querySelectorAll('[data-max-nodes]').forEach(btn => {
-                btn.classList.remove('btn-primary');
-            });
-            button.classList.add('btn-primary');
-            currentMaxNodes = parseInt(button.dataset.maxNodes);
-
-            if (window.arbGraph && window.arbGraph.currentSeed) {
-                window.arbGraph.explore(window.arbGraph.currentSeed, currentDepth, currentMaxNodes);
+        // Trending start
+        document.getElementById('trending-start')?.addEventListener('click', async () => {
+            if (window.arbGraph && window.arbGraph.trendingStart) {
+                await window.arbGraph.trendingStart();
             }
         });
-    });
 
-    // Random start
-    document.getElementById('random-start')?.addEventListener('click', async () => {
-        if (window.arbGraph && window.arbGraph.randomStart) {
-            await window.arbGraph.randomStart();
-        }
-    });
+        // Center graph
+        document.getElementById('center-graph')?.addEventListener('click', () => {
+            if (window.arbGraph && window.arbGraph.centerView) {
+                window.arbGraph.centerView();
+            }
+        });
 
-    // Trending start
-    document.getElementById('trending-start')?.addEventListener('click', async () => {
-        if (window.arbGraph && window.arbGraph.trendingStart) {
-            await window.arbGraph.trendingStart();
-        }
-    });
+        // Reset graph
+        document.getElementById('reset-graph')?.addEventListener('click', () => {
+            if (window.arbGraph && window.arbGraph.reset) {
+                window.arbGraph.reset();
+            }
+        });
 
-    // Center graph
-    document.getElementById('center-graph')?.addEventListener('click', () => {
-        if (window.arbGraph && window.arbGraph.centerView) {
-            window.arbGraph.centerView();
-        }
-    });
+        // Export PNG
+        document.getElementById('export-png')?.addEventListener('click', () => {
+            if (window.arbGraph && window.arbGraph.exportPNG) {
+                window.arbGraph.exportPNG();
+            }
+        });
 
-    // Reset graph
-    document.getElementById('reset-graph')?.addEventListener('click', () => {
-        if (window.arbGraph && window.arbGraph.reset) {
-            window.arbGraph.reset();
-        }
-    });
+        // Close panel
+        document.getElementById('close-panel')?.addEventListener('click', () => {
+            document.getElementById('sound-panel')?.classList.add('hidden');
+        });
 
-    // Export PNG
-    document.getElementById('export-png')?.addEventListener('click', () => {
-        if (window.arbGraph && window.arbGraph.exportPNG) {
-            window.arbGraph.exportPNG();
-        }
-    });
+        // Search
+        let searchTimeout;
+        const searchInput = document.getElementById('graph-search');
+        const searchResults = document.getElementById('search-results');
 
-    // Close panel
-    document.getElementById('close-panel')?.addEventListener('click', () => {
-        document.getElementById('sound-panel')?.classList.add('hidden');
-    });
+        searchInput?.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
 
-    // Search
-    let searchTimeout;
-    const searchInput = document.getElementById('graph-search');
-    const searchResults = document.getElementById('search-results');
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
 
-    searchInput?.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        const query = e.target.value;
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/wp-json/arborisis/v1/sounds?search=${encodeURIComponent(query)}&per_page=5`);
+                    const sounds = await response.json();
 
-        if (query.length < 2) {
-            searchResults.classList.add('hidden');
-            return;
-        }
-
-        searchTimeout = setTimeout(async () => {
-            try {
-                const response = await fetch(`/wp-json/arborisis/v1/sounds?search=${encodeURIComponent(query)}&per_page=5`);
-                const sounds = await response.json();
-
-                if (sounds.length > 0) {
-                    searchResults.innerHTML = sounds.map(sound => `
+                    if (sounds.length > 0) {
+                        searchResults.innerHTML = sounds.map(sound => `
                         <button class="w-full text-left px-4 py-2 hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors" data-sound-id="${sound.id}">
                             <div class="font-medium">${sound.title}</div>
                             <div class="text-xs text-dark-500">${sound.tags?.slice(0, 3).join(', ') || ''}</div>
                         </button>
                     `).join('');
 
-                    searchResults.classList.remove('hidden');
+                        searchResults.classList.remove('hidden');
 
-                    // Add click listeners
-                    searchResults.querySelectorAll('[data-sound-id]').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            const soundId = parseInt(btn.dataset.soundId);
-                            if (window.arbGraph && window.arbGraph.explore) {
-                                window.arbGraph.explore(soundId, currentDepth, currentMaxNodes);
-                                searchResults.classList.add('hidden');
-                                searchInput.value = '';
-                            }
+                        // Add click listeners
+                        searchResults.querySelectorAll('[data-sound-id]').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const soundId = parseInt(btn.dataset.soundId);
+                                if (window.arbGraph && window.arbGraph.explore) {
+                                    window.arbGraph.explore(soundId, currentDepth, currentMaxNodes);
+                                    searchResults.classList.add('hidden');
+                                    searchInput.value = '';
+                                }
+                            });
                         });
-                    });
-                } else {
-                    searchResults.innerHTML = '<div class="px-4 py-2 text-sm text-dark-500">Aucun résultat</div>';
-                    searchResults.classList.remove('hidden');
+                    } else {
+                        searchResults.innerHTML = '<div class="px-4 py-2 text-sm text-dark-500">Aucun résultat</div>';
+                        searchResults.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
                 }
-            } catch (error) {
-                console.error('Search error:', error);
-            }
-        }, 300);
-    });
+            }, 300);
+        });
 
-    // Click outside to close search results
-    document.addEventListener('click', (e) => {
-        if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
-            searchResults?.classList.add('hidden');
-        }
+        // Click outside to close search results
+        document.addEventListener('click', (e) => {
+            if (!searchInput?.contains(e.target) && !searchResults?.contains(e.target)) {
+                searchResults?.classList.add('hidden');
+            }
+        });
     });
-});
 </script>
 
 <?php get_footer(); ?>
