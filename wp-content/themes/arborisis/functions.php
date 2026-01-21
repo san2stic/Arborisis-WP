@@ -151,7 +151,6 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
-        wp_script_add_data('arborisis-map', 'type', 'module');
 
         if (isset($map['css'])) {
             foreach ($map['css'] as $css) {
@@ -175,7 +174,6 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
-        wp_script_add_data('arborisis-graph', 'type', 'module');
 
         if (isset($graph['css'])) {
             foreach ($graph['css'] as $css) {
@@ -199,7 +197,6 @@ function arborisis_enqueue_page_scripts()
             ARBORISIS_THEME_VERSION,
             true
         );
-        wp_script_add_data('arborisis-player', 'type', 'module');
 
         if (isset($player['css'])) {
             foreach ($player['css'] as $css) {
@@ -220,6 +217,27 @@ function arborisis_enqueue_page_scripts()
 function is_production()
 {
     return !defined('WP_ENV') || WP_ENV === 'production';
+}
+
+/**
+ * Add type="module" to Vite scripts
+ */
+add_filter('script_loader_tag', 'arborisis_add_module_type', 10, 3);
+function arborisis_add_module_type($tag, $handle, $src)
+{
+    // List of scripts that need type="module"
+    $module_scripts = [
+        'arborisis-map',
+        'arborisis-graph',
+        'arborisis-player',
+    ];
+
+    if (in_array($handle, $module_scripts)) {
+        // Replace <script with <script type="module"
+        $tag = str_replace('<script ', '<script type="module" ', $tag);
+    }
+
+    return $tag;
 }
 
 /**
