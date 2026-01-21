@@ -111,6 +111,14 @@ Aller à l'Étape 7 (Troubleshooting)
 
 ## 🐛 Étape 7 : Troubleshooting
 
+### Erreur : "Composer dependencies require PHP >= 8.4.0"
+
+❌ **Problème** : Ancien composer.lock pas à jour
+
+✅ **Solution** : Faire `git pull` puis rebuilder
+
+Voir le guide complet : [ERREUR-PHP-8.4.md](ERREUR-PHP-8.4.md)
+
 ### Erreur : "Class Aws\S3\S3Client not found"
 
 ❌ **Problème** : L'autoloader Composer n'est pas chargé
