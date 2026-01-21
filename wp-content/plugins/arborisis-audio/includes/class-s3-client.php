@@ -53,27 +53,32 @@ class ARB_S3_Client {
      * Generate presigned PUT URL
      */
     public static function create_presigned_put_url($key, $content_type, $expires = '+15 minutes') {
-        $client = self::get();
-        $bucket = getenv('S3_BUCKET');
+        // Create a separate client with public endpoint for presigned URL generation
+        $public_endpoint = getenv('S3_PUBLIC_ENDPOINT') ?: getenv('S3_ENDPOINT');
+        $region   = getenv('S3_REGION') ?: 'us-east-1';
+        $key_id   = getenv('S3_ACCESS_KEY');
+        $secret   = getenv('S3_SECRET_KEY');
+        $bucket   = getenv('S3_BUCKET');
 
-        $cmd = $client->getCommand('PutObject', [
+        $public_client = new S3Client([
+            'version'     => 'latest',
+            'region'      => $region,
+            'endpoint'    => $public_endpoint,
+            'credentials' => [
+                'key'    => $key_id,
+                'secret' => $secret,
+            ],
+            'use_path_style_endpoint' => true,
+        ]);
+
+        $cmd = $public_client->getCommand('PutObject', [
             'Bucket'      => $bucket,
             'Key'         => $key,
             'ContentType' => $content_type,
         ]);
 
-        $request = $client->createPresignedRequest($cmd, $expires);
-        $url = (string) $request->getUri();
-
-        // Replace internal endpoint with public endpoint if configured
-        $internal_endpoint = getenv('S3_ENDPOINT');
-        $public_endpoint = getenv('S3_PUBLIC_ENDPOINT') ?: $internal_endpoint;
-
-        if ($internal_endpoint && $public_endpoint && $internal_endpoint !== $public_endpoint) {
-            $url = str_replace($internal_endpoint, $public_endpoint, $url);
-        }
-
-        return $url;
+        $request = $public_client->createPresignedRequest($cmd, $expires);
+        return (string) $request->getUri();
     }
 
     /**
