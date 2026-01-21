@@ -87,9 +87,6 @@ RUN curl -o wordpress.tar.gz -fSL https://wordpress.org/latest.tar.gz \
 # Copy custom wp-content (plugins and themes) - this will overlay the default wp-content
 COPY --chown=www-data:www-data ./wp-content /var/www/html/wp-content
 
-# Copy wp-config.php and other custom files
-COPY --chown=www-data:www-data ./wp-config.php /var/www/html/wp-config.php
-
 # Copy composer dependencies from build stage
 COPY --from=composer-build --chown=www-data:www-data /app/vendor ./vendor
 
@@ -106,6 +103,10 @@ RUN mkdir -p \
 # Configure Supervisor
 COPY docker/supervisord.conf /etc/supervisord.conf
 
+# Add entrypoint script for wp-config.php generation
+COPY docker/docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Security: Run as non-root where possible
 RUN chown -R www-data:www-data /var/lib/nginx /var/log/nginx
 
@@ -115,6 +116,9 @@ EXPOSE 80
 # Health check with better parameters
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD SCRIPT_NAME=/ping SCRIPT_FILENAME=/ping REQUEST_METHOD=GET cgi-fcgi -bind -connect 127.0.0.1:9000 || exit 1
+
+# Set entrypoint to handle wp-config.php
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 # Start supervisor (manages nginx + php-fpm)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
