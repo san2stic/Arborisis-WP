@@ -32,11 +32,11 @@ while IFS= read -r line || [ -n "$line" ]; do
         value="${value#\'}"
         value="${value%\'}"
         
-        # Escape double quotes in the value
-        value="${value//\"/\\\"}"
+        # Escape $ as $$ for Docker Compose (prevents variable interpolation)
+        value="${value//\$/\$\$}"
         
-        # Write with double quotes
-        echo "${key}=\"${value}\"" >> "$OUTPUT_FILE.tmp"
+        # Write without quotes (Docker Compose includes quotes as part of value)
+        echo "${key}=${value}" >> "$OUTPUT_FILE.tmp"
     else
         # Invalid line, keep as is
         echo "$line" >> "$OUTPUT_FILE.tmp"
@@ -46,4 +46,4 @@ done < "$INPUT_FILE"
 # Move temp file to output
 mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
 
-echo "✅ Created $OUTPUT_FILE with properly quoted values"
+echo "✅ Created $OUTPUT_FILE with escaped dollar signs (prevents Docker Compose variable interpolation)"
