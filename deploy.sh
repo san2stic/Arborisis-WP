@@ -25,9 +25,22 @@ if [ ! -f "$SOURCE_ENV" ]; then
     exit 1
 fi
 
-# Copy the env file to .env (docker-compose reads this automatically)
+# Process and quote the env file properly for Docker Compose
 echo -e "${YELLOW}📝 Preparing environment for Docker Compose...${NC}"
-cp "$SOURCE_ENV" "$DOCKER_ENV"
+
+# Use quote-env.sh to properly format the file
+if [ -f "./quote-env.sh" ]; then
+    ./quote-env.sh "$SOURCE_ENV" "$DOCKER_ENV"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Failed to prepare environment file${NC}"
+        exit 1
+    fi
+else
+    # Fallback: simple copy with warning
+    echo -e "${YELLOW}⚠️  quote-env.sh not found, using simple copy${NC}"
+    echo -e "${YELLOW}⚠️  This may cause issues with special characters${NC}"
+    cp "$SOURCE_ENV" "$DOCKER_ENV"
+fi
 
 # Verify critical variables exist in the file
 echo -e "${YELLOW}🔍 Validating environment variables...${NC}"
