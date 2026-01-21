@@ -208,6 +208,7 @@ get_header();
 </div>
 
 <script>
+    const nonce = '<?php echo wp_create_nonce('wp_rest'); ?>';
     let selectedFile = null;
     let uploadedS3Key = null;
 
@@ -288,7 +289,7 @@ get_header();
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.arborisData?.nonce || '',
+                    'X-WP-Nonce': nonce,
                 },
                 body: JSON.stringify({
                     filename: file.name,
@@ -377,7 +378,7 @@ get_header();
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.arborisData?.nonce || '',
+                    'X-WP-Nonce': nonce,
                 },
                 body: JSON.stringify(formData),
             });
