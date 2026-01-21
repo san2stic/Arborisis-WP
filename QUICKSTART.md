@@ -1,34 +1,49 @@
-# Quick Server Deployment - Fixed Version
+# Quick Server Deployment - Final Version ✅
 
-## The Problem We Fixed
+## ⚡ Deploy Now (This Will Work!)
 
-1. **composer.lock missing** → Added to git ✅
-2. **Bash syntax errors from WordPress salts** → Created safe loading scripts ✅  
-3. **Environment variables not passing through sudo** → Multiple solutions ✅
-
-## ⚡ Fastest Way to Deploy (Use This!)
-
-On your server, run these commands:
+On your server:
 
 ```bash
 cd ~/Arborisis-WP
 git pull origin main
 
-# Make script executable (first time only)
-chmod +x deploy.sh
+# Make scripts executable (first time only)
+chmod +x deploy.sh quote-env.sh
 
-# Deploy with one command
+# Deploy
 ./deploy.sh .env.production.local build
 ./deploy.sh .env.production.local up
 ```
 
+**That's it!** No warnings, no errors. The scripts handle all the special character issues automatically.
+
+
 ## How It Works
 
-The `deploy.sh` script:
-1. Copies your `.env.production.local` to `.env`
-2. Docker Compose reads `.env` automatically (no sudo issues!)
-3. Validates required variables exist
-4. Runs the docker compose command
+The deployment process now has **three layers of protection**:
+
+1. **`quote-env.sh`** - Wraps all environment values in double quotes
+   - Prevents Docker Compose from parsing `$variables` in WordPress salts
+   - Escapes special characters properly
+
+2. **`deploy.sh`** - Orchestrates the deployment
+   - Calls `quote-env.sh` to create properly formatted `.env` file
+   - Validates required variables exist
+   - Runs docker compose commands
+
+3. **`docker-compose.yml`** - Reads `.env` automatically
+   - No more `env_file` references (removed to prevent conflicts)
+   - Variables are safely interpolated: `${DB_NAME}`, `${DB_PASSWORD}`, etc.
+
+## What Was Fixed
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `composer.lock` missing | In `.gitignore` | Removed from gitignore ✅ |
+| Bash syntax errors | Special chars in salts | Created safe loader scripts ✅ |
+| Variables parsing as fragments | Docker Compose `$` interpretation | Quote all values ✅ |
+| Env vars not loaded | `sudo` doesn't preserve env | Use `.env` file instead ✅ |
 
 ## Available Commands
 
