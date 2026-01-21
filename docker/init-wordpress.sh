@@ -5,7 +5,9 @@ echo "Starting WordPress initialization..."
 
 # Wait for MySQL
 echo "Waiting for MySQL to be ready..."
-while ! mysqladmin ping -h"$DB_HOST" --silent; do
+# Use credentials to check connection
+while ! mysqladmin ping -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" --silent; do
+    echo "MySQL not ready yet..."
     sleep 2
 done
 
