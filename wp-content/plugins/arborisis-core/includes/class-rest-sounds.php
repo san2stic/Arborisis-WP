@@ -90,6 +90,9 @@ class ARB_REST_Sounds {
                 $args['orderby']  = 'meta_value_num';
                 $args['order']    = 'DESC';
                 break;
+            case 'random':
+                $args['orderby'] = 'rand';
+                break;
             default: // recent
                 $args['orderby'] = 'date';
                 $args['order']   = 'DESC';
@@ -217,8 +220,8 @@ class ARB_REST_Sounds {
                 'lat' => (float) $lat,
                 'lon' => (float) $lon,
             ] : null,
-            'plays'      => (int) get_post_meta($post->ID, '_arb_plays_count', true),
-            'likes'      => (int) get_post_meta($post->ID, '_arb_likes_count', true),
+            'plays_count' => (int) get_post_meta($post->ID, '_arb_plays_count', true),
+            'likes_count' => (int) get_post_meta($post->ID, '_arb_likes_count', true),
             'created_at' => $post->post_date,
         ];
     }
@@ -312,7 +315,7 @@ class ARB_REST_Sounds {
                 'description' => __('Sort order.', 'arborisis-core'),
                 'type'        => 'string',
                 'default'     => 'recent',
-                'enum'        => ['recent', 'popular', 'trending'],
+                'enum'        => ['recent', 'popular', 'trending', 'random'],
             ],
         ];
     }

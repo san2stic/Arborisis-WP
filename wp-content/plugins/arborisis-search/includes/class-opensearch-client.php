@@ -40,11 +40,19 @@ class ARB_OpenSearch_Client {
             ],
         ];
 
+        // Check if SSL verification should be enabled (production) or disabled (dev with self-signed certs)
+        $ssl_verify = getenv('OPENSEARCH_SSL_VERIFY') !== 'false';
+
         try {
-            return ClientBuilder::create()
-                ->setHosts($hosts)
-                ->setSSLVerification(false) // For self-signed certs in dev
-                ->build();
+            $builder = ClientBuilder::create()
+                ->setHosts($hosts);
+            
+            // Only disable SSL verification in development environments
+            if (!$ssl_verify) {
+                $builder->setSSLVerification(false);
+            }
+            
+            return $builder->build();
         } catch (Exception $e) {
             error_log('OpenSearch client creation error: ' . $e->getMessage());
             return null;

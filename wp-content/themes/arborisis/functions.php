@@ -93,7 +93,7 @@ function arborisis_enqueue_assets()
     }
 
     // Localize script with API data
-    wp_localize_script('arborisis-main', 'arborisData', [
+    wp_localize_script('arborisis-main', 'arbData', [
         'apiUrl' => rest_url('arborisis/v1'),
         'nonce' => wp_create_nonce('wp_rest'),
         'userId' => get_current_user_id(),
@@ -227,6 +227,7 @@ function arborisis_add_module_type($tag, $handle, $src)
 {
     // List of scripts that need type="module"
     $module_scripts = [
+        'arborisis-main',
         'arborisis-map',
         'arborisis-graph',
         'arborisis-player',

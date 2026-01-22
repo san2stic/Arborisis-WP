@@ -170,13 +170,18 @@ function arborisis_sanitize_checkbox($checked) {
  */
 add_action('customize_preview_init', 'arborisis_customize_preview_js');
 function arborisis_customize_preview_js() {
-    wp_enqueue_script(
-        'arborisis-customizer',
-        get_template_directory_uri() . '/js/customizer.js',
-        array('customize-preview'),
-        ARBORISIS_THEME_VERSION,
-        true
-    );
+    $customizer_js = get_template_directory() . '/js/customizer.js';
+    
+    // Only enqueue if the file exists
+    if (file_exists($customizer_js)) {
+        wp_enqueue_script(
+            'arborisis-customizer',
+            get_template_directory_uri() . '/js/customizer.js',
+            array('customize-preview', 'jquery'),
+            defined('ARBORISIS_THEME_VERSION') ? ARBORISIS_THEME_VERSION : '1.0.0',
+            true
+        );
+    }
 }
 
 /**

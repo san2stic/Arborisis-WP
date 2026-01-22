@@ -124,7 +124,7 @@ class ARB_Aggregator
     /**
      * Get plays for last N days
      */
-    private static function get_plays_last_n_days($sound_id, $days)
+    public static function get_plays_last_n_days($sound_id, $days)
     {
         global $wpdb;
         $table = $wpdb->prefix . 'arb_plays_daily';

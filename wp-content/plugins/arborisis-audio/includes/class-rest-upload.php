@@ -179,10 +179,31 @@ class ARB_REST_Upload
             update_post_meta($post_id, '_arb_filesize', (int) $sound_data['filesize']);
         }
 
-        // Save geo data
+        // Save geo data with validation
         if (!empty($sound_data['geo'])) {
             $lat = (float) $sound_data['geo']['lat'];
             $lon = (float) $sound_data['geo']['lon'];
+
+            // Validate GPS coordinates
+            if ($lat < -90 || $lat > 90) {
+                // Delete the post we just created since geo is invalid
+                wp_delete_post($post_id, true);
+                return new WP_Error(
+                    'invalid_latitude',
+                    __('Latitude must be between -90 and 90 degrees.', 'arborisis-audio'),
+                    ['status' => 400]
+                );
+            }
+
+            if ($lon < -180 || $lon > 180) {
+                // Delete the post we just created since geo is invalid
+                wp_delete_post($post_id, true);
+                return new WP_Error(
+                    'invalid_longitude',
+                    __('Longitude must be between -180 and 180 degrees.', 'arborisis-audio'),
+                    ['status' => 400]
+                );
+            }
 
             update_post_meta($post_id, '_arb_latitude', $lat);
             update_post_meta($post_id, '_arb_longitude', $lon);
@@ -233,6 +254,7 @@ class ARB_REST_Upload
         }
 
         return new WP_REST_Response([
+            'success' => true,
             'sound_id' => $post_id,
             'sound_url' => get_permalink($post_id),
         ], 201);

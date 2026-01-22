@@ -117,7 +117,7 @@ $current_user = wp_get_current_user();
                     $duration = get_post_meta($sound_id, '_arb_duration', true);
                     $plays_count = get_post_meta($sound_id, '_arb_plays_count', true) ?: 0;
                     $likes_count = get_post_meta($sound_id, '_arb_likes_count', true) ?: 0;
-                    $thumbnail = get_the_post_thumbnail_url($sound_id, 'medium') ?: get_template_directory_uri() . '/assets/placeholder.jpg';
+                    $thumbnail = get_the_post_thumbnail_url($sound_id, 'medium') ?: get_template_directory_uri() . '/assets/placeholder.svg';
             ?>
 
                     <div class="card group">

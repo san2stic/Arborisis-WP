@@ -118,7 +118,7 @@ export async function toggleLike(soundId) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-WP-Nonce': window.arborisisData?.nonce || ''
+                'X-WP-Nonce': window.arbData?.nonce || ''
             }
         });
 

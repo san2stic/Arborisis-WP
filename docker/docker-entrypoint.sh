@@ -19,15 +19,15 @@ define('DB_HOST', getenv('DB_HOST'));
 define('DB_CHARSET', 'utf8mb4');
 define('DB_COLLATE', '');
 
-// Security keys - generate new ones at https://api.wordpress.org/secret-key/1.1/salt/
-define('AUTH_KEY',         'put your unique phrase here');
-define('SECURE_AUTH_KEY',  'put your unique phrase here');
-define('LOGGED_IN_KEY',    'put your unique phrase here');
-define('NONCE_KEY',        'put your unique phrase here');
-define('AUTH_SALT',        'put your unique phrase here');
-define('SECURE_AUTH_SALT', 'put your unique phrase here');
-define('LOGGED_IN_SALT',   'put your unique phrase here');
-define('NONCE_SALT',       'put your unique phrase here');
+// Security keys - auto-generated or from environment
+define('AUTH_KEY',         getenv('WP_AUTH_KEY') ?: bin2hex(random_bytes(32)));
+define('SECURE_AUTH_KEY',  getenv('WP_SECURE_AUTH_KEY') ?: bin2hex(random_bytes(32)));
+define('LOGGED_IN_KEY',    getenv('WP_LOGGED_IN_KEY') ?: bin2hex(random_bytes(32)));
+define('NONCE_KEY',        getenv('WP_NONCE_KEY') ?: bin2hex(random_bytes(32)));
+define('AUTH_SALT',        getenv('WP_AUTH_SALT') ?: bin2hex(random_bytes(32)));
+define('SECURE_AUTH_SALT', getenv('WP_SECURE_AUTH_SALT') ?: bin2hex(random_bytes(32)));
+define('LOGGED_IN_SALT',   getenv('WP_LOGGED_IN_SALT') ?: bin2hex(random_bytes(32)));
+define('NONCE_SALT',       getenv('WP_NONCE_SALT') ?: bin2hex(random_bytes(32)));
 
 // WordPress database table prefix
 $table_prefix = 'wp_';

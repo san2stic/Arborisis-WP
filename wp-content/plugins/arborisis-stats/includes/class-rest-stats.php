@@ -118,13 +118,24 @@ class ARB_REST_Stats
                 "SELECT SUM(plays_count) FROM {$wpdb->prefix}arb_plays_daily"
             );
 
+            // Count unique countries from geo data
+            $geo_table = $wpdb->prefix . 'arb_geo_index';
+            $countries_count = 0;
+            if ($wpdb->get_var("SHOW TABLES LIKE '{$geo_table}'") === $geo_table) {
+                // Estimate countries from geohash first 2 chars (rough continent/region)
+                $countries_count = (int) $wpdb->get_var(
+                    "SELECT COUNT(DISTINCT LEFT(geohash, 3)) FROM {$geo_table}"
+                );
+            }
+
             return [
                 'total_sounds' => wp_count_posts('sound')->publish,
                 'total_plays' => $total_plays,
                 'total_users' => count_users()['total_users'],
+                'countries_count' => $countries_count,
                 'top_sounds' => ARB_Aggregator::top_sounds(10),
                 'top_users' => ARB_Aggregator::top_users(10),
-                'plays_timeline' => ARB_Aggregator::plays_timeline(30),
+                'timeline' => ARB_Aggregator::plays_timeline(30),
             ];
         });
     }
